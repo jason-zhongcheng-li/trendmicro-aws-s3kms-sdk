@@ -1,0 +1,26 @@
+{
+  "name": "trendmicro-aws-s3kms-sdk",
+  "version": "1.0.0",
+  "description": "TrendMicro Tech Assessment",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/zhongchengli/trendmicro-aws-s3kms-sdk.git"
+  },
+  "keywords": [
+    "AWS",
+    "S3-KMS"
+  ],
+  "author": "Jason Li",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/zhongchengli/trendmicro-aws-s3kms-sdk/issues"
+  },
+  "homepage": "https://github.com/zhongchengli/trendmicro-aws-s3kms-sdk#readme",
+  "devDependencies": {
+    "tslint": "^6.1.3"
+  }
+}

@@ -1,0 +1,108 @@
+{
+  "rules": {
+    "adjacent-overload-signatures": true,
+    "member-access": true,
+    "member-ordering": [
+      true,
+      {
+        "order": [
+          "public-static-field",
+          "public-static-method",
+          "protected-static-field",
+          "protected-static-method",
+          "private-static-field",
+          "private-static-method",
+          "public-instance-field",
+          "protected-instance-field",
+          "private-instance-field",
+          "public-constructor",
+          "protected-constructor",
+          "private-constructor",
+          "public-instance-method",
+          "protected-instance-method",
+          "private-instance-method"
+        ]
+      }
+    ],
+    "no-namespace": true,
+    "no-reference": true,
+    "prefer-for-of": true,
+    "typedef": true,
+    "unified-signatures": true,
+    "curly": true,
+    "no-bitwise": true,
+    "no-conditional-assignment": true,
+    "no-console": [
+      true,
+      "log"
+    ],
+    "no-construct": true,
+    "no-debugger": true,
+    "no-duplicate-super": true,
+    "no-eval": true,
+    "no-for-in-array": true,
+    "no-invalid-this": true,
+    "no-misused-new": true,
+    "no-null-keyword": false,
+    "no-string-throw": true,
+    "no-unsafe-finally": true,
+    "no-unused-expression": true,
+    "no-use-before-declare": true,
+    "radix": true,
+    "restrict-plus-operands": true,
+    "triple-equals": true,
+    "use-isnan": true,
+    "cyclomatic-complexity": [
+      true,
+      30
+    ],
+    "indent": [
+      true,
+      "spaces",
+      2
+    ],
+    "linebreak-style": [
+      true,
+      "LF"
+    ],
+    "prefer-const": true,
+    "trailing-comma": [
+      true,
+      {
+        "multiline": "never",
+        "singleline": "never"
+      }
+    ],
+    "align": true,
+    "array-type": [
+      true,
+      "array"
+    ],
+    "arrow-return-shorthand": true,
+    "comment-format": [
+      true,
+      "check-space"
+    ],
+    "import-spacing": true,
+    "interface-over-type-literal": true,
+    "new-parens": true,
+    "no-boolean-literal-compare": true,
+    "no-unnecessary-initializer": true,
+    "object-literal-key-quotes": [
+      true,
+      "as-needed"
+    ],
+    "object-literal-shorthand": true,
+    "one-variable-per-declaration": true,
+    "prefer-method-signature": true,
+    "quotemark": [
+      true,
+      "single",
+      "avoid-escape"
+    ],
+    "semicolon": [
+      true,
+      "always"
+    ]
+  }
+}

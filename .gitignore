@@ -1,0 +1,21 @@
+# Editor-specific
+
+# In case someone edit project in IDEA
+/.idea
+
+# In case someone edit project in VSCODE
+/.vscode
+
+# Installed libs
+/node_modules
+
+# Generated
+/.nyc_output
+/coverage
+/dist
+/reports
+npm-debug.log
+
+# Misc
+/tmp
+/*.md
