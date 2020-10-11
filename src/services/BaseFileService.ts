@@ -2,13 +2,14 @@ import * as fs from 'fs';
 import * as path from 'path';
 import { F_OK } from 'constants';
 import { E_TMPDIR_UNDEFINED, E_TMPDIR_UNWRITABLE } from '../messages';
+import { Readable } from 'stream';
 
 export interface FileOptions {
   tmpDir: string;
 }
 
-export class BaseFileService {
-  constructor(private options: FileOptions) {
+export class BaseFileService<O extends FileOptions> {
+  constructor(private options: O) {
     if (!options.tmpDir) {
       throw new Error(E_TMPDIR_UNDEFINED);
     }
@@ -20,15 +21,21 @@ export class BaseFileService {
     }
   }
 
+  public getOptions(): O {
+    return this.options;
+  }
+
   public getTempDir(): string {
     return this.options.tmpDir;
   }
 
-  public async saveToTempDir(txt: string, fileName: string): Promise<string> {
+  public async saveToTempDir(stream: Readable, fileName: string): Promise<string> {
     return new Promise<string>((resolve, reject) => {
       const dest: string = path.join(this.options.tmpDir, fileName);
-      fs.writeFileSync(dest, txt);
-      resolve(dest);
+      stream
+        .pipe(fs.createWriteStream(dest))
+        .on('close', () => resolve(dest))
+        .on('error', (err: Error) => reject(err));
     });
   }
 

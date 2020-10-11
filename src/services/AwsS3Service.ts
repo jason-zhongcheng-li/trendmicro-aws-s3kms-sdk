@@ -13,7 +13,7 @@ export interface S3FileOptions extends FileOptions {
   Expires?: number;
 }
 
-export class AwsS3Service extends BaseFileService {
+export class AwsS3Service extends BaseFileService<S3FileOptions> {
   constructor(options: S3FileOptions, private s3: S3) {
     super(options);
 
@@ -23,7 +23,15 @@ export class AwsS3Service extends BaseFileService {
   }
 
   public async getFile(key: string): Promise<string> {
-    return '';
+    const params: any = {
+      Bucket: this.getOptions().Bucket,
+      Key: key
+    };
+    // console.log('params = ', params);
+
+    const stream = this.s3.getObject(params).createReadStream();
+
+    return this.saveToTempDir(stream, key.replace(/\//g, '_'));
   }
 
   public async getAllKeys(): Promise<string[]> {

@@ -5,7 +5,7 @@ import { S3FileOptions, AwsS3Service } from '../../../src/services/AwsS3Service'
 import { E_BUCKET_UNDEFINED } from '../../../src/messages';
 import { Readable } from 'stream';
 
-describe.only('AwsS3Service unit test', () => {
+describe('AwsS3Service unit test', () => {
   let options: S3FileOptions;
   let s3: S3;
   let instance: AwsS3Service;
@@ -41,7 +41,7 @@ describe.only('AwsS3Service unit test', () => {
   });
 
   it('should get all keys in a bucket', async () => {
-    const expect = [];
+    const expect = [] as string[];
 
     const result = await instance.getAllKeys();
     console.log('result = ', result);

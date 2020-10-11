@@ -4,12 +4,13 @@ import * as fs from 'fs';
 import * as rimraf from 'rimraf';
 import { F_OK } from 'constants';
 import { E_TMPDIR_UNDEFINED, E_TMPDIR_UNWRITABLE } from '../../../src/messages';
+import { Readable } from 'stream';
 
 
 
 describe.only('BaseFileService functional test', () => {
   let options: FileOptions;
-  let instance: BaseFileService;
+  let instance: BaseFileService<FileOptions>;
   const TEST_FILE = __dirname + '/file.txt';
 
 
@@ -53,9 +54,17 @@ describe.only('BaseFileService functional test', () => {
     });
   });
 
-  it('Should save file to temp dir', async () => {
+  it.only('Should save file to temp dir', async () => {
     const expect = `${instance.getTempDir()}/test-file.txt`;
-    const result = await instance.saveToTempDir('Test content', 'test-file.txt');
+
+    const stream = new Readable({ objectMode: true });
+
+    stream._read = () => {
+      stream.push('abc123');
+      stream.push(null);
+    };
+
+    const result = await instance.saveToTempDir(stream, 'test-file.txt');
     assert.doesNotThrow(exists);
     assert.strictEqual(expect, result);
   });
