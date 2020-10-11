@@ -19,11 +19,19 @@ export class AwsS3Service extends BaseFileService<S3FileOptions> {
   constructor(options: S3FileOptions, private s3: S3) {
     super(options);
 
+    // Validate if Bucket value available
     if (!options.Bucket) {
       throw new Error(E_BUCKET_UNDEFINED);
     }
   }
 
+
+  /**
+   * Get object/file from AWS S3 with object key
+   *
+   * @param  {string} key - The AWS S3 key to the file
+   * @returns {Promise<string>} - The file path to the local file
+   */
   public async getFile(key: string): Promise<string> {
     const params: any = {
       Bucket: this.getOptions().Bucket,
@@ -32,10 +40,16 @@ export class AwsS3Service extends BaseFileService<S3FileOptions> {
 
     const stream = this.s3.getObject(params).createReadStream();
 
-    // Save downloaded file to local dir
+    // Save downloaded file to local path
     return this.saveToLocalDir(stream, key.replace(/\//g, '_'));
   }
 
+
+  /**
+   * Get all keys from S3 Bucket to download one by one
+   *
+   * @returns {Promise<string[]>} - All the keys in a S3 bucket
+   */
   public async getAllKeys(): Promise<string[]> {
     const keys = [] as string[];
     let IsTruncated = false;
@@ -43,13 +57,16 @@ export class AwsS3Service extends BaseFileService<S3FileOptions> {
     let StartAfter = '';
 
     while (true) {
+
       let params: ListObjectsV2Request = {
         Bucket: this.getOptions().Bucket,
         MaxKeys: this.getOptions().MaxKeys
       };
+
       if (StartAfter) {
         params = { ...params, StartAfter };
       }
+
       try {
         const res = await this.s3.listObjectsV2(params).promise();
         res.Contents.forEach(item => {
@@ -71,9 +88,7 @@ export class AwsS3Service extends BaseFileService<S3FileOptions> {
       } catch (error) {
         throw error;
       }
-
     }
-
     return keys;
   }
 }
