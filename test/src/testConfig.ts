@@ -7,6 +7,7 @@ export interface testConfig {
   ServerSideEncryption?: string;
   StorageClass?: string;
   Expires?: number;
+  apiVersion?: string;
 }
 
 export default testConfig;

@@ -6,7 +6,7 @@ import { AwsS3Service, S3FileOptions } from './../../../src/services/AwsS3Servic
 import AWS = require('aws-sdk');
 import { testConfig } from './../testConfig';
 
-describe('AwsS3Service functional test', () => {
+describe('AwsS3Service functional test', async () => {
   let options: S3FileOptions;
   let instance: AwsS3Service;
   let s3: S3;
@@ -24,10 +24,12 @@ describe('AwsS3Service functional test', () => {
       secretAccessKey: `${process.env.SECRET_ACCESS_KEY}`,
       Bucket: `${process.env.BUCKET}`,
       tmpDir: `${__dirname}/tmp`,
-      region: `${process.env.REGION}`
+      region: `${process.env.REGION}`,
+      apiVersion: '2006-03-01'
     } as testConfig;
 
     s3 = new AWS.S3(config);
+    // console.log('s3 = ', s3);
 
     instance = new AwsS3Service(options, s3);
 

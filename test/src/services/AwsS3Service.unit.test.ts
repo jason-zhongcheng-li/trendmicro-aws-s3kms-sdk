@@ -6,7 +6,7 @@ import { E_BUCKET_UNDEFINED } from '../../../src/messages';
 import { Readable } from 'stream';
 import { ListObjectsV2Output } from 'aws-sdk/clients/s3';
 
-describe.only('AwsS3Service unit test', async () => {
+describe('AwsS3Service unit test', async () => {
   let options: S3FileOptions;
   let s3: S3;
   let instance: AwsS3Service;
