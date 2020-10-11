@@ -10,6 +10,7 @@ describe('FileService functional test', () => {
   let instance: FileService;
   const bucket: string = 's3-bucket';
   const fileName: string = 'file-name';
+  const keys: string[] = ['object-1', 'object-2'];
 
   beforeEach(() => {
 
@@ -51,7 +52,8 @@ describe('FileService functional test', () => {
   });
 
   it('Should encrypt a summary file for a list of downloaded files', () => {
-    const result = instance.encryptSummaryFile(bucket, fileName);
+
+    const result = instance.encryptSummaryFile(bucket, keys, fileName);
   });
 
   it('Should decrypt a summary file for a list of downloaded files', () => {

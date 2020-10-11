@@ -51,7 +51,7 @@ describe('BaseFileService functional test', () => {
     });
   });
 
-  it('Should save file to temp dir', async () => {
+  it('Should save file to local dir', async () => {
     const expect = `${instance.getTempDir()}/test-file.txt`;
 
     const stream = new Readable({ objectMode: true });
@@ -64,6 +64,14 @@ describe('BaseFileService functional test', () => {
     const result = await instance.saveToLocalDir(stream, 'test-file.txt');
     assert.doesNotThrow(exists);
     assert.strictEqual(expect, result);
+  });
+
+  it('Should write array to local dir', async () => {
+    const array = ['object-1.txt', 'object-2.jpg'];
+
+    const result = await instance.writeArrayToLocalDir(array);
+
+    assert.strictEqual(result.indexOf('_ObjectLists') > 0, true);
   });
 
   it('Should clean up a temp file', done => {

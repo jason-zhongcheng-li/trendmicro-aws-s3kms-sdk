@@ -5,7 +5,8 @@ export class FileService {
   constructor(private s3Service: AwsS3Service, private kmsService: AwsKMSService) {
   }
 
-  public async encryptSummaryFile(bucket: string, fileName?: string): Promise<string> {
+  public async encryptSummaryFile(bucket: string, keys: string[], fileName?: string): Promise<string> {
+
 
     return '';
   }

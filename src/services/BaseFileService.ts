@@ -1,4 +1,5 @@
 import * as fs from 'fs';
+import { DateTime } from 'luxon';
 import * as path from 'path';
 import { F_OK } from 'constants';
 import { Readable } from 'stream';
@@ -40,7 +41,7 @@ export class BaseFileService<O extends FileOptions> {
    *
    * @param  {Readable} stream
    * @param  {string} fileName
-   * @returns {Promise<string>} return local path where downloaed file saved
+   * @returns {Promise<string>} return local path where downloaed file is saved
    */
   public async saveToLocalDir(stream: Readable, fileName: string): Promise<string> {
     return new Promise<string>((resolve, reject) => {
@@ -51,6 +52,40 @@ export class BaseFileService<O extends FileOptions> {
         .pipe(fs.createWriteStream(dest))
         .on('close', () => resolve(dest))
         .on('error', (err: Error) => reject(err));
+    });
+  }
+
+  /**
+   * @param  {string[]} array
+   * @param  {string} fileName? - optional args
+   * @returns {Promise<string>} return local path where summary file is saved
+   */
+  public async writeArrayToLocalDir(array: string[], fileName?: string): Promise<string> {
+
+    if (!fileName) {
+      const nowStr = DateTime.local().toFormat('yyyy-MM-dd_hh-mm-ss');
+      fileName = nowStr.concat('_ObjectLists.txt');
+    }
+
+    const dest = path.join(this.options.localDir, fileName);
+    const writeStream = fs.createWriteStream(dest);
+
+    return new Promise<string>((resolve, reject) => {
+      // write each value of the array on the file breaking line
+      array.forEach(value => writeStream.write(`${value}\n`));
+
+      // the finish event is emitted when all data has been flushed from the stream
+      writeStream.on('finish', () => {
+        resolve(fileName);
+      });
+
+      // handle the errors on the write process
+      writeStream.on('error', err => {
+        reject(err);
+      });
+
+      // close the stream
+      writeStream.end();
     });
   }
 

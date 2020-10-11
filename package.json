@@ -40,7 +40,9 @@
     "typescript": "^3.9.7"
   },
   "dependencies": {
-    "aws-sdk": "^2.771.0"
+    "@types/luxon": "^1.25.0",
+    "aws-sdk": "^2.771.0",
+    "luxon": "^1.25.0"
   },
   "engines": {
     "node": ">=8"

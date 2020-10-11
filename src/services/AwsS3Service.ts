@@ -1,6 +1,5 @@
 import { S3 } from 'aws-sdk';
 import { BaseFileService, FileOptions } from './BaseFileService';
-import { E_BUCKET_UNDEFINED } from '../messages';
 import { ListObjectsV2Request, GetObjectRequest } from 'aws-sdk/clients/s3';
 
 
