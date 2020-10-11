@@ -6,11 +6,11 @@ import { F_OK } from 'constants';
 
 
 
-describe('BaseFileService unit test', () => {
+describe('BaseFileService functional test', () => {
   let options: FileOptions;
   let instance: BaseFileService;
   const TEST_FILE = __dirname + '/file.txt';
-  let exists: any;
+
 
   beforeEach(() => {
     options = {
@@ -18,10 +18,6 @@ describe('BaseFileService unit test', () => {
     } as FileOptions;
 
     instance = new BaseFileService(options);
-
-    exists = () => {
-      fs.accessSync(instance.getTempDir() + '/test-file.txt', F_OK);
-    };
   });
 
   afterEach(() => {
@@ -52,24 +48,29 @@ describe('BaseFileService unit test', () => {
   });
 
   it('Should save file to temp dir', async () => {
-    await instance.saveToTempDir('Test content');
-    assert.doesNotThrow(exists());
+    const expect = `${instance.getTempDir()}/test-file.txt`;
+    const result = await instance.saveToTempDir('Test content', 'test-file.txt');
+    assert.doesNotThrow(exists);
+    assert.strictEqual(expect, result);
   });
 
   it('Should clean up a temp file', done => {
 
     fs.writeFileSync(`${instance.getTempDir()}/test-file.txt`, 'Test content');
-    assert.doesNotThrow(exists());
+    assert.doesNotThrow(exists);
 
     instance
       .cleanUpTempFile('test-file.txt')
       .then(() => {
-        assert.throws(exists());
+        assert.throws(exists);
         done();
       })
       .catch(done);
   });
 
+  function exists() {
+    fs.accessSync(instance.getTempDir() + '/test-file.txt', F_OK);
+  }
 
 
 });
