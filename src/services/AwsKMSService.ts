@@ -1,5 +1,5 @@
 import { KMS } from 'aws-sdk';
-import { EncryptRequest } from 'aws-sdk/clients/kms';
+import { EncryptRequest, DecryptRequest } from 'aws-sdk/clients/kms';
 import { BaseFileService, FileOptions } from './BaseFileService';
 import { E_KMS_KEYID_UNDEFINED } from '../messages';
 
@@ -24,25 +24,34 @@ export class AwsKMSService extends BaseFileService<KMSFileOptions>{
    * @param  {Buffer} data
    * @returns @returns {Promise<string>}
    */
-  public async encrypt(rawData: Buffer): Promise<string> {
+  public async encrypt(data: Buffer): Promise<string> {
     const params = {
       KeyId: this.getOptions().KeyId,
-      Plaintext: rawData
+      Plaintext: data
     } as EncryptRequest;
 
     const { CiphertextBlob } = await this.kms.encrypt(params).promise();
 
-    // store encrypted data as base64 encoded string
+    // return encrypted data as base64 encoded string
     return CiphertextBlob.toString('base64');
   }
 
   /**
    * Decrypt data with KMS
    *
-   * @param  {string} encryptData
+   * @param  {string} data
    * @returns @returns {Promise<string>} return raw data
    */
-  public async decrypt(encryptData: string): Promise<string> {
-    return '';
+  public async decrypt(data: string): Promise<string> {
+    const params = {
+      KeyId: this.getOptions().KeyId,
+      CiphertextBlob: Buffer.from(data, 'base64')
+    } as DecryptRequest;
+
+    // destructure Plaintext from MS.Types.DecryptResponse
+    const { Plaintext } = await this.kms.decrypt(params).promise();
+
+    // return raw data
+    return Plaintext.toString();
   }
 }

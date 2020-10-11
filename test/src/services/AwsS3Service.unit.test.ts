@@ -6,14 +6,14 @@ import { E_BUCKET_UNDEFINED } from '../../../src/messages';
 import { Readable } from 'stream';
 import { ListObjectsV2Output } from 'aws-sdk/clients/s3';
 
-describe('AwsS3Service unit test', () => {
+describe.only('AwsS3Service unit test', async () => {
   let options: S3FileOptions;
   let s3: S3;
   let instance: AwsS3Service;
   const key = '/path/to/object';
   const textContent = 'abc123';
 
-  beforeEach(() => {
+  beforeEach(async () => {
     options = {
       Bucket: 'the-bucket',
       ACL: 'private',
@@ -27,7 +27,7 @@ describe('AwsS3Service unit test', () => {
 
   });
 
-  it('should throw if `options.Bucket` is missing in the constructor', () => {
+  it('should throw if `options.Bucket` is missing in the constructor', async () => {
     assert.throws(() => {
       instance = new AwsS3Service({ localDir: __dirname + '/tmp' } as S3FileOptions, s3);
     }, new RegExp(E_BUCKET_UNDEFINED));
@@ -50,6 +50,8 @@ describe('AwsS3Service unit test', () => {
 
     const filePath = await instance.getFile(key);
     const result = fs.readFileSync(filePath, 'utf-8');
+    // console.log('filePath = ', filePath);
+    // console.log('result in S3 = ', result);
 
     assert.strictEqual(result, textContent, 'should be the file sent by the dummy stream');
 
