@@ -1,4 +1,4 @@
-import { S3 } from 'aws-sdk';
+import { S3, Request } from 'aws-sdk';
 import * as assert from 'assert';
 import * as fs from 'fs';
 import { S3FileOptions, AwsS3Service } from '../../../src/services/AwsS3Service';
@@ -10,6 +10,7 @@ describe('AwsS3Service unit test', () => {
   let s3: S3;
   let instance: AwsS3Service;
   const key = '/path/to/object';
+  const textContent = 'abc123';
 
   beforeEach(() => {
     options = {
@@ -17,7 +18,7 @@ describe('AwsS3Service unit test', () => {
       ACL: 'private',
       ServerSideEncryption: 'AES256',
       StorageClass: 'REDUCED_REDUNDANCY',
-      tmpDir: `${__dirname}/tmp`
+      localDir: `${__dirname}/tmp`
     } as S3FileOptions;
     s3 = {} as S3;
     instance = new AwsS3Service(options, s3);
@@ -26,17 +27,29 @@ describe('AwsS3Service unit test', () => {
 
   it('should throw if `options.Bucket` is missing in the constructor', () => {
     assert.throws(() => {
-      instance = new AwsS3Service({ tmpDir: __dirname + '/tmp' } as S3FileOptions, s3);
+      instance = new AwsS3Service({ localDir: __dirname + '/tmp' } as S3FileOptions, s3);
     }, new RegExp(E_BUCKET_UNDEFINED));
   });
 
-  it('should get a file', async () => {
+  it('should get a file from AWS bucket', async () => {
+
+    s3.getObject = () => {
+      const stream = new Readable({ objectMode: true });
+
+      stream._read = () => {
+        stream.push(textContent);
+        stream.push(null);
+      };
+
+      return <Request<any, any>>{
+        createReadStream: () => stream
+      };
+    };
 
     const filePath = await instance.getFile(key);
     const result = fs.readFileSync(filePath, 'utf-8');
-    console.log('result = ', result);
 
-    assert.strictEqual(result, '', 'should be the file sent by the dummy stream');
+    assert.strictEqual(result, textContent, 'should be the file sent by the dummy stream');
 
   });
 

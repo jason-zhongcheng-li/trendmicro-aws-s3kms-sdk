@@ -3,20 +3,17 @@ import * as assert from 'assert';
 import * as fs from 'fs';
 import * as rimraf from 'rimraf';
 import { F_OK } from 'constants';
-import { E_TMPDIR_UNDEFINED, E_TMPDIR_UNWRITABLE } from '../../../src/messages';
+import { E_LOCALDIR_UNDEFINED, E_LOCALDIR_UNWRITABLE } from '../../../src/messages';
 import { Readable } from 'stream';
 
-
-
-describe.only('BaseFileService functional test', () => {
+describe('BaseFileService functional test', () => {
   let options: FileOptions;
   let instance: BaseFileService<FileOptions>;
   const TEST_FILE = __dirname + '/file.txt';
 
-
   beforeEach(() => {
     options = {
-      tmpDir: `${__dirname}/tmp`
+      localDir: `${__dirname}/tmp`
     } as FileOptions;
 
     instance = new BaseFileService(options);
@@ -35,26 +32,26 @@ describe.only('BaseFileService functional test', () => {
   it('Should throw if no temp directory is found or readable', () => {
 
     assert.throws(() => {
-      instance = new BaseFileService({ tmpDir: '' });
-    }, new RegExp(E_TMPDIR_UNDEFINED));
+      instance = new BaseFileService({ localDir: '' });
+    }, new RegExp(E_LOCALDIR_UNDEFINED));
 
     assert.throws(() => {
       instance = new BaseFileService({
-        tmpDir: instance.getTempDir() + '/trash'
+        localDir: instance.getTempDir() + '/trash'
       });
-    }, new RegExp(E_TMPDIR_UNWRITABLE));
+    }, new RegExp(E_LOCALDIR_UNWRITABLE));
 
 
     fs.mkdirSync(instance.getTempDir() + '/trash');
 
     assert.doesNotThrow(() => {
       instance = new BaseFileService({
-        tmpDir: instance.getTempDir() + '/trash'
+        localDir: instance.getTempDir() + '/trash'
       });
     });
   });
 
-  it.only('Should save file to temp dir', async () => {
+  it('Should save file to temp dir', async () => {
     const expect = `${instance.getTempDir()}/test-file.txt`;
 
     const stream = new Readable({ objectMode: true });
@@ -64,7 +61,7 @@ describe.only('BaseFileService functional test', () => {
       stream.push(null);
     };
 
-    const result = await instance.saveToTempDir(stream, 'test-file.txt');
+    const result = await instance.saveToLocalDir(stream, 'test-file.txt');
     assert.doesNotThrow(exists);
     assert.strictEqual(expect, result);
   });
@@ -75,7 +72,7 @@ describe.only('BaseFileService functional test', () => {
     assert.doesNotThrow(exists);
 
     instance
-      .cleanUpTempFile('test-file.txt')
+      .cleanUpLocalFile('test-file.txt')
       .then(() => {
         assert.throws(exists);
         done();

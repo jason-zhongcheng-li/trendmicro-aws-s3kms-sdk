@@ -1,23 +1,23 @@
 import * as fs from 'fs';
 import * as path from 'path';
 import { F_OK } from 'constants';
-import { E_TMPDIR_UNDEFINED, E_TMPDIR_UNWRITABLE } from '../messages';
 import { Readable } from 'stream';
+import { E_LOCALDIR_UNDEFINED, E_LOCALDIR_UNWRITABLE } from '../messages';
 
 export interface FileOptions {
-  tmpDir: string;
+  localDir: string;
 }
 
 export class BaseFileService<O extends FileOptions> {
   constructor(private options: O) {
-    if (!options.tmpDir) {
-      throw new Error(E_TMPDIR_UNDEFINED);
+    if (!options.localDir) {
+      throw new Error(E_LOCALDIR_UNDEFINED);
     }
 
     try {
-      fs.accessSync(options.tmpDir, F_OK);
+      fs.accessSync(options.localDir, F_OK);
     } catch (e) {
-      throw new Error(E_TMPDIR_UNWRITABLE);
+      throw new Error(E_LOCALDIR_UNWRITABLE);
     }
   }
 
@@ -26,12 +26,12 @@ export class BaseFileService<O extends FileOptions> {
   }
 
   public getTempDir(): string {
-    return this.options.tmpDir;
+    return this.options.localDir;
   }
 
-  public async saveToTempDir(stream: Readable, fileName: string): Promise<string> {
+  public async saveToLocalDir(stream: Readable, fileName: string): Promise<string> {
     return new Promise<string>((resolve, reject) => {
-      const dest: string = path.join(this.options.tmpDir, fileName);
+      const dest: string = path.join(this.options.localDir, fileName);
       stream
         .pipe(fs.createWriteStream(dest))
         .on('close', () => resolve(dest))
@@ -39,9 +39,9 @@ export class BaseFileService<O extends FileOptions> {
     });
   }
 
-  public async cleanUpTempFile(fileName: string): Promise<void> {
+  public async cleanUpLocalFile(fileName: string): Promise<void> {
     return new Promise<void>((resolve, reject) => {
-      const dest: string = path.join(this.options.tmpDir, fileName);
+      const dest: string = path.join(this.options.localDir, fileName);
 
       fs.unlink(dest, (err: Error) => {
         if (err) {

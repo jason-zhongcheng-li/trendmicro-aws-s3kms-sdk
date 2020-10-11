@@ -27,11 +27,11 @@ export class AwsS3Service extends BaseFileService<S3FileOptions> {
       Bucket: this.getOptions().Bucket,
       Key: key
     };
-    // console.log('params = ', params);
 
     const stream = this.s3.getObject(params).createReadStream();
 
-    return this.saveToTempDir(stream, key.replace(/\//g, '_'));
+    // Save downloaded file to temp dir
+    return this.saveToLocalDir(stream, key.replace(/\//g, '_'));
   }
 
   public async getAllKeys(): Promise<string[]> {
