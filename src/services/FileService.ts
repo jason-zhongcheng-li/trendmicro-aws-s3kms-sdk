@@ -15,19 +15,25 @@ export class FileService {
     return '';
   }
 
-  private async downloadAllObjects(bucket: string): Promise<string[]> {
+  /**
+   * @param  {string} bucket
+   * @returns {Promise<string[]>} - Download all objects and return all the keys in a S3 bucket
+   */
+  public async downloadAllObjects(bucket: string): Promise<string[]> {
     const result: string[] = [];
 
     // Get all keys of objects in the bucket
     const keys = await this.s3Service.getAllKeys(bucket);
 
     // Download one by one
-    keys.map(async key => {
-      const destPath = await this.s3Service.getFile(bucket, key);
-      if (!!destPath) {
-        result.push(key);
-      }
-    });
+    // use Promise.all() to make sure arry push key after async getFile() function done.
+    await Promise.all(
+      keys.map(async key => {
+        const destPath = await this.s3Service.getFile(bucket, key).catch(err => console.error(err));
+        if (!!destPath) {
+          result.push(key);
+        }
+      }));
 
     return result;
   }
