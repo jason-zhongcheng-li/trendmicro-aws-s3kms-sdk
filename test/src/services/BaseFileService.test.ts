@@ -3,10 +3,11 @@ import * as assert from 'assert';
 import * as fs from 'fs';
 import * as rimraf from 'rimraf';
 import { F_OK } from 'constants';
+import { E_TMPDIR_UNDEFINED, E_TMPDIR_UNWRITABLE } from '../../../src/messages';
 
 
 
-describe('BaseFileService functional test', () => {
+describe.only('BaseFileService functional test', () => {
   let options: FileOptions;
   let instance: BaseFileService;
   const TEST_FILE = __dirname + '/file.txt';
@@ -31,11 +32,16 @@ describe('BaseFileService functional test', () => {
   });
 
   it('Should throw if no temp directory is found or readable', () => {
+
+    assert.throws(() => {
+      instance = new BaseFileService({ tmpDir: '' });
+    }, new RegExp(E_TMPDIR_UNDEFINED));
+
     assert.throws(() => {
       instance = new BaseFileService({
         tmpDir: instance.getTempDir() + '/trash'
       });
-    });
+    }, new RegExp(E_TMPDIR_UNWRITABLE));
 
 
     fs.mkdirSync(instance.getTempDir() + '/trash');
