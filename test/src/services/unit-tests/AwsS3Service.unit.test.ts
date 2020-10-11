@@ -1,10 +1,10 @@
 import { S3, Request } from 'aws-sdk';
 import * as assert from 'assert';
 import * as fs from 'fs';
-import { S3FileOptions, AwsS3Service } from '../../../src/services/AwsS3Service';
-import { E_BUCKET_UNDEFINED } from '../../../src/messages';
 import { Readable } from 'stream';
 import { ListObjectsV2Output } from 'aws-sdk/clients/s3';
+import { S3FileOptions, AwsS3Service } from '../../../../src/services/AwsS3Service';
+import { E_BUCKET_UNDEFINED } from '../../../../src/messages';
 
 describe('AwsS3Service unit test', async () => {
   let options: S3FileOptions;

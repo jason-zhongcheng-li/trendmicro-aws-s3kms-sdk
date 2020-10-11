@@ -1,11 +1,9 @@
+import { testConfig } from './../../testConfig';
+import { KMSFileOptions, AwsKMSService } from './../../../../src/services/AwsKMSService';
 import { KMS } from 'aws-sdk';
-import { KMSFileOptions } from './../../../src/services/AwsKMSService';
 import * as assert from 'assert';
 import * as sysPath from 'path';
 import * as fs from 'fs';
-import AWS = require('aws-sdk');
-import { testConfig } from './../testConfig';
-import { AwsKMSService } from '../../../src/services/AwsKMSService';
 
 describe('AwsKMSService functional', () => {
   let options: KMSFileOptions;
@@ -18,7 +16,6 @@ describe('AwsKMSService functional', () => {
       KeyId: `${process.env.KEY_ID}`,
       localDir: `${__dirname}/tmp`
     };
-    // console.log('options = ', options);
 
     const config = {
       accessKeyId: `${process.env.ACCESS_KEY_ID}`,
@@ -27,8 +24,8 @@ describe('AwsKMSService functional', () => {
       region: `${process.env.REGION}`
     } as testConfig;
 
-    kms = new AWS.KMS(config) as KMS;
-    // console.log(s3);
+    kms = new KMS(config) as KMS;
+
     instance = new AwsKMSService(options, kms);
 
     fs.writeFileSync(sysPath.join(options.localDir, fileName), 'def456');
@@ -50,7 +47,6 @@ describe('AwsKMSService functional', () => {
   it('should decrypt', async () => {
 
     const filePath = sysPath.join(options.localDir, 'encrypt.txt');
-    // console.log('filePath = ', filePath);
     const rawData = fs.readFileSync(filePath, 'utf-8');
     const result = await instance.decrypt(rawData);
 

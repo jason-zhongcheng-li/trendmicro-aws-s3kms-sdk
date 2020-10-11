@@ -1,9 +1,8 @@
-import { KMSFileOptions } from './../../../src/services/AwsKMSService';
 import { KMS, Request } from 'aws-sdk';
 import * as assert from 'assert';
-import { AwsKMSService } from '../../../src/services/AwsKMSService';
-import { E_KMS_KEYID_UNDEFINED } from '../../../src/messages';
 import { CiphertextType, EncryptResponse, DecryptResponse } from 'aws-sdk/clients/kms';
+import { AwsKMSService, KMSFileOptions } from '../../../../src/services/AwsKMSService';
+import { E_KMS_KEYID_UNDEFINED } from '../../../../src/messages';
 
 describe('AwsKMSService unit test', async () => {
   let options: KMSFileOptions;
@@ -12,7 +11,7 @@ describe('AwsKMSService unit test', async () => {
   let CiphertextBlob: CiphertextType;
   let Plaintext: string;
 
-  beforeEach(async () => {
+  before(async () => {
     options = {
       KeyId: 'key-id',
       localDir: __dirname + '/tmp'

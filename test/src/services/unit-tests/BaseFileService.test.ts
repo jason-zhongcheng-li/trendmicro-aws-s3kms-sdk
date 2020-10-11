@@ -1,10 +1,10 @@
-import { BaseFileService, FileOptions } from './../../../src/services/BaseFileService';
 import * as assert from 'assert';
 import * as fs from 'fs';
 import * as rimraf from 'rimraf';
 import { F_OK } from 'constants';
-import { E_LOCALDIR_UNDEFINED, E_LOCALDIR_UNWRITABLE } from '../../../src/messages';
 import { Readable } from 'stream';
+import { FileOptions, BaseFileService } from '../../../../src/services/BaseFileService';
+import { E_LOCALDIR_UNDEFINED, E_LOCALDIR_UNWRITABLE } from '../../../../src/messages';
 
 describe('BaseFileService functional test', () => {
   let options: FileOptions;
