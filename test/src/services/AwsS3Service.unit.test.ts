@@ -4,6 +4,7 @@ import * as fs from 'fs';
 import { S3FileOptions, AwsS3Service } from '../../../src/services/AwsS3Service';
 import { E_BUCKET_UNDEFINED } from '../../../src/messages';
 import { Readable } from 'stream';
+import { ListObjectsV2Output } from 'aws-sdk/clients/s3';
 
 describe('AwsS3Service unit test', () => {
   let options: S3FileOptions;
@@ -18,7 +19,8 @@ describe('AwsS3Service unit test', () => {
       ACL: 'private',
       ServerSideEncryption: 'AES256',
       StorageClass: 'REDUCED_REDUNDANCY',
-      localDir: `${__dirname}/tmp`
+      localDir: `${__dirname}/tmp`,
+      MaxKeys: 2
     } as S3FileOptions;
     s3 = {} as S3;
     instance = new AwsS3Service(options, s3);
@@ -53,13 +55,46 @@ describe('AwsS3Service unit test', () => {
 
   });
 
-  it('should get all keys in a bucket', async () => {
-    const expect = [] as string[];
+  it.only('should get all keys in a bucket if any', async () => {
+    const expect: string[] = ['test1-file.jpg', 'test2-file.jpg', 'test2-file.jpg'];
+    let numCalls = 0;
+    s3.listObjectsV2 = () => {
+      numCalls++;
+
+      if (numCalls === 1) {
+        console.log('numCalls = ', numCalls);
+        const res: ListObjectsV2Output = {
+          Contents: [
+            { Key: 'test1-file.jpg' },
+            { Key: 'test2-file.jpg' }],
+          IsTruncated: true,
+          NextContinuationToken: 'next-token'
+
+        };
+
+        return <Request<any, any>>{
+          promise: () => res
+        };
+      } else {
+        console.log('numCalls = ', numCalls);
+        const res: ListObjectsV2Output = {
+          Contents: [
+            { Key: 'test2-file.jpg' }],
+          IsTruncated: false,
+          NextContinuationToken: ''
+        };
+
+        return <Request<any, any>>{
+          promise: () => res
+        };
+      }
+
+    };
 
     const result = await instance.getAllKeys();
-    console.log('result = ', result);
+    console.log(result);
 
-    assert.strictEqual(result, expect, 'should be all the keys in bucket');
+    assert.deepStrictEqual(result, expect, 'should be all the keys in bucket');
 
   });
 });
