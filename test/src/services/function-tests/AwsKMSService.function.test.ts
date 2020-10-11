@@ -20,7 +20,6 @@ describe('AwsKMSService functional', () => {
     const config = {
       accessKeyId: `${process.env.ACCESS_KEY_ID}`,
       secretAccessKey: `${process.env.SECRET_ACCESS_KEY}`,
-      Bucket: `${process.env.BUCKET}`,
       region: `${process.env.REGION}`
     } as testConfig;
 

@@ -12,25 +12,19 @@ describe('AwsS3Service unit test', async () => {
   let instance: AwsS3Service;
   const key = '/path/to/object';
   const textContent = 'abc123';
+  const bucket = 's3-bucket';
 
   beforeEach(async () => {
     options = {
-      Bucket: 'the-bucket',
       ACL: 'private',
       ServerSideEncryption: 'AES256',
       StorageClass: 'REDUCED_REDUNDANCY',
       localDir: `${__dirname}/tmp`,
       MaxKeys: 2
-    } as S3FileOptions;
+    };
     s3 = {} as S3;
     instance = new AwsS3Service(options, s3);
 
-  });
-
-  it('should throw if `options.Bucket` is missing in the constructor', async () => {
-    assert.throws(() => {
-      instance = new AwsS3Service({ localDir: __dirname + '/tmp' } as S3FileOptions, s3);
-    }, new RegExp(E_BUCKET_UNDEFINED));
   });
 
   it('should get a file from AWS bucket', async () => {
@@ -48,7 +42,7 @@ describe('AwsS3Service unit test', async () => {
       };
     };
 
-    const filePath = await instance.getFile(key);
+    const filePath = await instance.getFile(bucket, key);
     const result = fs.readFileSync(filePath, 'utf-8');
     // console.log('filePath = ', filePath);
     // console.log('result in S3 = ', result);
@@ -91,7 +85,7 @@ describe('AwsS3Service unit test', async () => {
 
     };
 
-    const result = await instance.getAllKeys();
+    const result = await instance.getAllKeys(bucket);
 
     assert.deepStrictEqual(result, expect, 'should be all the keys in bucket');
 

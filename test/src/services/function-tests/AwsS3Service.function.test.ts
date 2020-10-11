@@ -12,20 +12,20 @@ describe('AwsS3Service functional test', async () => {
   let instance: AwsS3Service;
   let s3: S3;
   let key: string;
+  let bucket: string;
 
   before(() => {
-    // options = { defaultConfig } as S3FileOptions;
+
+    bucket = `${process.env.BUCKET}`;
+
     options = {
-      Bucket: `${process.env.BUCKET}`,
       localDir: `${__dirname}/tmp`
     };
-    const config = {
+    const config: testConfig = {
       accessKeyId: `${process.env.ACCESS_KEY_ID}`,
       secretAccessKey: `${process.env.SECRET_ACCESS_KEY}`,
-      Bucket: `${process.env.BUCKET}`,
-      tmpDir: `${__dirname}/tmp`,
       region: `${process.env.REGION}`
-    } as testConfig;
+    };
 
     // Create S3 service object
     s3 = new AWS.S3(config);
@@ -35,7 +35,7 @@ describe('AwsS3Service functional test', async () => {
 
 
   it('should get objects key', async () => {
-    const result = await instance.getAllKeys();
+    const result = await instance.getAllKeys(bucket);
 
     assert.strictEqual(result.length > 0, true);
 
@@ -45,7 +45,7 @@ describe('AwsS3Service functional test', async () => {
 
   it('should get file', async () => {
     const expect = path.join(options.localDir, key);
-    const result = await instance.getFile(key);
+    const result = await instance.getFile(bucket, key);
 
     assert.strictEqual(result, expect);
   });

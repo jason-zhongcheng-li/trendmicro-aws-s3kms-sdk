@@ -66,7 +66,7 @@ export class BaseFileService<O extends FileOptions> {
 
       // delete file in the destination
       fs.unlink(dest, (err: Error) => {
-        if (err) {
+        if (!!err) {
           reject(err);
         } else {
           resolve();
