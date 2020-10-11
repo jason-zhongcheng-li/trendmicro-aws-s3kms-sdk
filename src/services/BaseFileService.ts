@@ -23,5 +23,17 @@ export class BaseFileService {
     return this.options.tmpDir;
   }
 
+  public async saveToTempDir(txt: string): Promise<string> {
+    return new Promise<string>((resolve, reject) => {
+
+    });
+  }
+
+  public async cleanUpTempFile(fileName: string): Promise<void> {
+    return new Promise<void>((resolve, reject) => {
+
+    });
+  }
+
 
 }
