@@ -30,7 +30,7 @@ export class AwsS3Service extends BaseFileService<S3FileOptions> {
 
     const stream = this.s3.getObject(params).createReadStream();
 
-    // Save downloaded file to temp dir
+    // Save downloaded file to local dir
     return this.saveToLocalDir(stream, key.replace(/\//g, '_'));
   }
 

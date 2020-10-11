@@ -6,6 +6,9 @@
 # In case someone edit project in VSCODE
 /.vscode
 
+# Ignore credential info in local env
+/.env
+
 # Installed libs
 /node_modules
 
