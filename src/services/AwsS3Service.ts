@@ -38,12 +38,11 @@ export class AwsS3Service extends BaseFileService<S3FileOptions> {
 
   public async getAllKeys(): Promise<string[]> {
     const keys = [] as string[];
-    let isContinure = true;
     let IsTruncated = false;
     let NextContinuationToken = '';
-    let StartAfter;
+    let StartAfter = '';
 
-    while (isContinure) {
+    while (true) {
       let params: ListObjectsV2Request = {
         Bucket: this.getOptions().Bucket,
         MaxKeys: this.getOptions().MaxKeys
@@ -54,17 +53,20 @@ export class AwsS3Service extends BaseFileService<S3FileOptions> {
       try {
         const res = await this.s3.listObjectsV2(params).promise();
         res.Contents.forEach(item => {
-          // console.log('item.Key = ', item.Key);
+          // add item key to the key array
           keys.push(item.Key);
         });
+
+        // Check if there are more keys in the bucket
         IsTruncated = res.IsTruncated;
         NextContinuationToken = res.NextContinuationToken;
-        console.log('IsTruncated = ', IsTruncated);
-        console.log('NextContinuationToken = ', NextContinuationToken);
+
         if (IsTruncated && NextContinuationToken) {
+          // If there are more keys, set StartAfter to be last key in current retrieving
           StartAfter = res.Contents.slice(-1)[0].Key;
         } else {
-          isContinure = false;
+          // Break the loop since there is no more key
+          break;
         }
       } catch (error) {
         throw error;

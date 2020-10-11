@@ -55,14 +55,13 @@ describe('AwsS3Service unit test', () => {
 
   });
 
-  it.only('should get all keys in a bucket if any', async () => {
+  it('should get all keys in a bucket if any', async () => {
     const expect: string[] = ['test1-file.jpg', 'test2-file.jpg', 'test2-file.jpg'];
     let numCalls = 0;
     s3.listObjectsV2 = () => {
       numCalls++;
 
       if (numCalls === 1) {
-        console.log('numCalls = ', numCalls);
         const res: ListObjectsV2Output = {
           Contents: [
             { Key: 'test1-file.jpg' },
@@ -76,7 +75,6 @@ describe('AwsS3Service unit test', () => {
           promise: () => res
         };
       } else {
-        console.log('numCalls = ', numCalls);
         const res: ListObjectsV2Output = {
           Contents: [
             { Key: 'test2-file.jpg' }],
@@ -92,7 +90,6 @@ describe('AwsS3Service unit test', () => {
     };
 
     const result = await instance.getAllKeys();
-    console.log(result);
 
     assert.deepStrictEqual(result, expect, 'should be all the keys in bucket');
 
