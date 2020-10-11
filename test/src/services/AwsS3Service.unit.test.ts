@@ -1,13 +1,15 @@
 import { S3 } from 'aws-sdk';
 import * as assert from 'assert';
+import * as fs from 'fs';
 import { S3FileOptions, AwsS3Service } from '../../../src/services/AwsS3Service';
 import { E_BUCKET_UNDEFINED } from '../../../src/messages';
+import { Readable } from 'stream';
 
 describe.only('AwsS3Service unit test', () => {
   let options: S3FileOptions;
   let s3: S3;
   let instance: AwsS3Service;
-  const key = 'path/to/file';
+  const key = '/path/to/object';
 
   beforeEach(() => {
     options = {
@@ -26,5 +28,25 @@ describe.only('AwsS3Service unit test', () => {
     assert.throws(() => {
       instance = new AwsS3Service({ tmpDir: __dirname + '/tmp' } as S3FileOptions, s3);
     }, new RegExp(E_BUCKET_UNDEFINED));
+  });
+
+  it('should get a file', async () => {
+
+    const filePath = await instance.getFile(key);
+    const result = fs.readFileSync(filePath, 'utf-8');
+    console.log('result = ', result);
+
+    assert.strictEqual(result, '', 'should be the file sent by the dummy stream');
+
+  });
+
+  it('should get all keys in a bucket', async () => {
+    const expect = [];
+
+    const result = await instance.getAllKeys();
+    console.log('result = ', result);
+
+    assert.strictEqual(result, expect, 'should be all the keys in bucket');
+
   });
 });

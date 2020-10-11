@@ -21,4 +21,14 @@ export class AwsS3Service extends BaseFileService {
       throw new Error(E_BUCKET_UNDEFINED);
     }
   }
+
+  public async getFile(key: string): Promise<string> {
+    return '';
+  }
+
+  public async getAllKeys(): Promise<string[]> {
+    const keys = [] as string[];
+
+    return keys;
+  }
 }
