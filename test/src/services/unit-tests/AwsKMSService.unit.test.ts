@@ -16,7 +16,7 @@ describe('AwsKMSService unit test', async () => {
       KeyId: 'key-id',
       localDir: __dirname + '/tmp'
     } as KMSFileOptions;
-    kms = {} as KMS;
+    kms = Object.assign(KMS.prototype);
     CiphertextBlob = Object.assign(Buffer.prototype);
     Plaintext = Object.assign(String.prototype);
     instance = new AwsKMSService(options, kms);

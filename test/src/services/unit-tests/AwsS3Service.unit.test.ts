@@ -22,7 +22,7 @@ describe('AwsS3Service unit test', async () => {
       localDir: `${__dirname}/tmp`,
       MaxKeys: 2
     };
-    s3 = {} as S3;
+    s3 = Object.assign(S3.prototype);
     instance = new AwsS3Service(options, s3);
   });
 
