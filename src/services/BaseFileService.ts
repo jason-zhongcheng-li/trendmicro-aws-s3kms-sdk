@@ -32,7 +32,7 @@ export class BaseFileService<O extends FileOptions> {
   /**
    * @returns string
    */
-  public getTempDir(): string {
+  public getLocalDir(): string {
     return this.options.localDir;
   }
 
@@ -55,6 +55,7 @@ export class BaseFileService<O extends FileOptions> {
     });
   }
 
+  // TODO: remove? not in use?
   /**
    * @param  {string[]} array
    * @param  {string} fileName? - optional args
@@ -76,7 +77,7 @@ export class BaseFileService<O extends FileOptions> {
 
       // the finish event is emitted when all data has been flushed from the stream
       writeStream.on('finish', () => {
-        resolve(fileName);
+        resolve(dest);
       });
 
       // handle the errors on the write process
