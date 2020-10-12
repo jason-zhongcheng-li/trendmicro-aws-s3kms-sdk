@@ -14,7 +14,7 @@ describe('AwsS3Service functional test', async () => {
   let key: string;
   let bucket: string;
 
-  before(() => {
+  beforeEach(() => {
 
     bucket = `${process.env.BUCKET}`;
 
@@ -39,7 +39,7 @@ describe('AwsS3Service functional test', async () => {
 
     assert.strictEqual(result.length > 0, true);
 
-    // set key for getFile function test
+    // set key for getFile Functional test
     key = result[0];
   });
 

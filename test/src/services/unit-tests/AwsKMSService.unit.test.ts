@@ -11,7 +11,7 @@ describe('AwsKMSService unit test', async () => {
   let CiphertextBlob: CiphertextType;
   let Plaintext: string;
 
-  before(async () => {
+  beforeEach(() => {
     options = {
       KeyId: 'key-id',
       localDir: __dirname + '/tmp'
