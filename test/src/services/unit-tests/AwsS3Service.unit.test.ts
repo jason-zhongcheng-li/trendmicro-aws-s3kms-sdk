@@ -24,7 +24,6 @@ describe('AwsS3Service unit test', async () => {
     };
     s3 = {} as S3;
     instance = new AwsS3Service(options, s3);
-
   });
 
   it('should get a file from AWS bucket', async () => {

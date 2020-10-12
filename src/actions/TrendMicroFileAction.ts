@@ -1,10 +1,10 @@
 import * as fs from 'fs';
 import { DateTime } from 'luxon';
 import * as path from 'path';
-import { AwsKMSService } from './AwsKMSService';
-import { AwsS3Service } from './AwsS3Service';
+import { AwsS3Service } from './../services/AwsS3Service';
+import { AwsKMSService } from './../services/AwsKMSService';
 
-export class AwsFileService {
+export class TrendMicroFileAction {
   constructor(private s3Service: AwsS3Service, private kmsService: AwsKMSService) {
   }
 

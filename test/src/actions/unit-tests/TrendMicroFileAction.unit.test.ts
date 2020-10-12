@@ -1,19 +1,19 @@
 import * as assert from 'assert';
-import { AwsKMSService, KMSFileOptions } from './../../../../src/services/AwsKMSService';
-import { AwsS3Service, S3FileOptions } from './../../../../src/services/AwsS3Service';
-import { AwsFileService } from './../../../../src/services/AwsFileService';
+import { AwsKMSService, KMSFileOptions } from '../../../../src/services/AwsKMSService';
+import { AwsS3Service, S3FileOptions } from '../../../../src/services/AwsS3Service';
 import { S3, KMS } from 'aws-sdk';
 import testConfig from '../../testConfig';
+import { TrendMicroFileAction } from './../../../../src/actions/TrendMicroFileAction';
 
 
-describe('AwsFileService functional test', () => {
+describe('TrendMicroFileAction unit test', () => {
   let s3Service: AwsS3Service;
   let kmsService: AwsKMSService;
   let s3Options: S3FileOptions;
   let kmsOptions: KMSFileOptions;
   let s3: S3;
   let kms: KMS;
-  let instance: AwsFileService;
+  let instance: TrendMicroFileAction;
   const bucket: string = 's3-bucket';
   const fileName: string = 'file-name';
   const keys: string[] = ['object-1', 'object-2'];
@@ -38,7 +38,7 @@ describe('AwsFileService functional test', () => {
     kms = new KMS(config);
     s3Service = new AwsS3Service(s3Options, s3);
     kmsService = new AwsKMSService(kmsOptions, kms);
-    instance = new AwsFileService(s3Service, kmsService);
+    instance = new TrendMicroFileAction(s3Service, kmsService);
   });
 
   it('Should download all objects', async () => {
