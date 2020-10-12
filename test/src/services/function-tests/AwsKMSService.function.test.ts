@@ -5,7 +5,7 @@ import * as assert from 'assert';
 import * as sysPath from 'path';
 import * as fs from 'fs';
 
-describe('AwsKMSService functional', () => {
+describe('AwsKMSService function test', () => {
   let options: KMSFileOptions;
   let kms: KMS;
   let instance: AwsKMSService;

@@ -1,43 +1,22 @@
 import * as assert from 'assert';
-import { AwsKMSService, KMSFileOptions } from '../../../../src/services/AwsKMSService';
-import { AwsS3Service, S3FileOptions } from '../../../../src/services/AwsS3Service';
-import { S3, KMS } from 'aws-sdk';
-import testConfig from '../../testConfig';
+import { AwsKMSService } from '../../../../src/services/AwsKMSService';
+import { AwsS3Service } from '../../../../src/services/AwsS3Service';
 import { TrendMicroFileAction } from './../../../../src/actions/TrendMicroFileAction';
 
 
 describe('TrendMicroFileAction unit test', () => {
   let s3Service: AwsS3Service;
   let kmsService: AwsKMSService;
-  let s3Options: S3FileOptions;
-  let kmsOptions: KMSFileOptions;
-  let s3: S3;
-  let kms: KMS;
   let instance: TrendMicroFileAction;
   const bucket: string = 's3-bucket';
   const fileName: string = 'file-name';
   const keys: string[] = ['object-1', 'object-2'];
+  const localDir: string = `${__dirname}/tmp`;
 
   beforeEach(() => {
 
-    kmsOptions = {
-      KeyId: `${process.env.KEY_ID}`
-    };
-
-    s3Options = {
-      localDir: `${__dirname}/tmp`
-    };
-
-    const config: testConfig = {
-      accessKeyId: `${process.env.ACCESS_KEY_ID}`,
-      secretAccessKey: `${process.env.SECRET_ACCESS_KEY}`,
-      region: `${process.env.REGION}`
-    };
-
-    s3 = new S3(config);
-    kms = new KMS(config);
-    s3Service = new AwsS3Service(s3Options, s3);
-    kmsService = new AwsKMSService(kmsOptions, kms);
+    s3Service = Object.create(AwsS3Service.prototype);
+    kmsService = Object.create(AwsKMSService.prototype);
     instance = new TrendMicroFileAction(s3Service, kmsService);
   });
 
@@ -73,17 +52,22 @@ describe('TrendMicroFileAction unit test', () => {
   });
 
   it('Should encrypt a summary file for a list of downloaded files', async () => {
+    const expect = localDir.concat('/', fileName);
+
+    s3Service.getLocalDir = () => localDir;
+    kmsService.encrypt = async () => expect;
 
     const result = await instance.encryptSummaryFile(bucket, keys, fileName);
-    // console.log('result in encrypt = ', result);
+    assert.deepStrictEqual(result, expect);
   });
 
   it('Should decrypt a summary file for a list of downloaded files', async () => {
-    const fileName = 'file-name';
+    const expect = 'raw-data';
+
+    s3Service.getLocalDir = () => localDir;
+    kmsService.decrypt = async () => expect;
+
     const result = await instance.decryptSummaryFile(fileName);
-    // const keys = ['key-1.txt\n', 'key-3.jpg\n', 'key-2.pdf\n'];
-    // console.log(keys.join('').toString());
-    // console.log('result in decrypt = ', result);
-    assert.deepStrictEqual(result, keys.join('\n'));
+    assert.deepStrictEqual(result, expect);
   });
 });
