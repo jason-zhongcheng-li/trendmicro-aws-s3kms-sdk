@@ -3,14 +3,13 @@ import { EncryptRequest, DecryptRequest } from 'aws-sdk/clients/kms';
 import { BaseFileService, FileOptions } from './BaseFileService';
 import { E_KMS_KEYID_UNDEFINED } from '../messages';
 
-export interface KMSFileOptions extends FileOptions {
+export interface KMSFileOptions {
   KeyId: string;
 }
 
-export class AwsKMSService extends BaseFileService<KMSFileOptions>{
+export class AwsKMSService {
 
-  constructor(options: KMSFileOptions, private kms: KMS) {
-    super(options);
+  constructor(private options: KMSFileOptions, private kms: KMS) {
 
     // Validate if KeyId value available
     if (!options.KeyId) {
@@ -26,7 +25,7 @@ export class AwsKMSService extends BaseFileService<KMSFileOptions>{
    */
   public async encrypt(data: Buffer): Promise<string> {
     const params = {
-      KeyId: this.getOptions().KeyId,
+      KeyId: this.options.KeyId,
       Plaintext: data
     } as EncryptRequest;
 
@@ -44,7 +43,7 @@ export class AwsKMSService extends BaseFileService<KMSFileOptions>{
    */
   public async decrypt(data: string): Promise<string> {
     const params = {
-      KeyId: this.getOptions().KeyId,
+      KeyId: this.options.KeyId,
       CiphertextBlob: Buffer.from(data, 'base64')
     } as DecryptRequest;
 
