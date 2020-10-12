@@ -1,6 +1,5 @@
 import { KMS } from 'aws-sdk';
 import { EncryptRequest, DecryptRequest } from 'aws-sdk/clients/kms';
-import { BaseFileService, FileOptions } from './BaseFileService';
 import { E_KMS_KEYID_UNDEFINED } from '../messages';
 
 export interface KMSFileOptions {
@@ -42,6 +41,7 @@ export class AwsKMSService {
    * @returns @returns {Promise<string>} return raw data
    */
   public async decrypt(data: string): Promise<string> {
+    // console.log('data in KMS service = ', data);
     const params = {
       KeyId: this.options.KeyId,
       CiphertextBlob: Buffer.from(data, 'base64')

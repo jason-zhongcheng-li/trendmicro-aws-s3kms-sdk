@@ -51,7 +51,10 @@ describe('AwsKMSService functional', () => {
   it('should decrypt', async () => {
 
     const filePath = sysPath.join(localDir, 'encrypt.txt');
+
+    // Use a synchronous function for debug/testing only
     const rawData = fs.readFileSync(filePath, 'utf-8');
+
     const result = await instance.decrypt(rawData);
 
     assert.strictEqual(result, 'def456');
