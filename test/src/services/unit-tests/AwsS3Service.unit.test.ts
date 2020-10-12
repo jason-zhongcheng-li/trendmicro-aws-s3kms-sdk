@@ -10,7 +10,7 @@ describe('AwsS3Service unit test', async () => {
   let options: S3FileOptions;
   let s3: S3;
   let instance: AwsS3Service;
-  const key = '/path/to/object';
+  const key = 'test-data';
   const textContent = 'abc123';
   const bucket = 's3-bucket';
 
@@ -52,7 +52,7 @@ describe('AwsS3Service unit test', async () => {
   });
 
   it('should get all keys in a bucket if any', async () => {
-    const expect: string[] = ['test1-file.jpg', 'test2-file.jpg', 'test2-file.jpg'];
+    const expect: string[] = ['test1-file.jpg', 'test2-file.jpg', 'test3-file.jpg'];
     let numCalls = 0;
     s3.listObjectsV2 = () => {
       numCalls++;
@@ -73,7 +73,7 @@ describe('AwsS3Service unit test', async () => {
       } else {
         const res: ListObjectsV2Output = {
           Contents: [
-            { Key: 'test2-file.jpg' }],
+            { Key: 'test3-file.jpg' }],
           IsTruncated: false,
           NextContinuationToken: ''
         };
