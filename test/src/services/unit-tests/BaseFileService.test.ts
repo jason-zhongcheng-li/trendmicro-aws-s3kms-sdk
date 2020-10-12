@@ -6,7 +6,7 @@ import { Readable } from 'stream';
 import { FileOptions, BaseFileService } from '../../../../src/services/BaseFileService';
 import { E_LOCALDIR_UNDEFINED, E_LOCALDIR_UNWRITABLE } from '../../../../src/messages';
 
-describe('BaseFileService functional test', () => {
+describe('BaseFileService unit test', () => {
   let options: FileOptions;
   let instance: BaseFileService<FileOptions>;
   const TEST_FILE = __dirname + '/file.txt';
@@ -24,8 +24,8 @@ describe('BaseFileService functional test', () => {
       fs.unlinkSync(TEST_FILE);
     }
 
-    if (fs.existsSync(instance.getTempDir() + '/trash')) {
-      rimraf.sync(instance.getTempDir() + '/trash');
+    if (fs.existsSync(instance.getLocalDir() + '/trash')) {
+      rimraf.sync(instance.getLocalDir() + '/trash');
     }
   });
 
@@ -37,22 +37,22 @@ describe('BaseFileService functional test', () => {
 
     assert.throws(() => {
       instance = new BaseFileService({
-        localDir: instance.getTempDir() + '/trash'
+        localDir: instance.getLocalDir() + '/trash'
       });
     }, new RegExp(E_LOCALDIR_UNWRITABLE));
 
 
-    fs.mkdirSync(instance.getTempDir() + '/trash');
+    fs.mkdirSync(instance.getLocalDir() + '/trash');
 
     assert.doesNotThrow(() => {
       instance = new BaseFileService({
-        localDir: instance.getTempDir() + '/trash'
+        localDir: instance.getLocalDir() + '/trash'
       });
     });
   });
 
   it('Should save file to local dir', async () => {
-    const expect = `${instance.getTempDir()}/test-file.txt`;
+    const expect = `${instance.getLocalDir()}/test-file.txt`;
 
     const stream = new Readable({ objectMode: true });
 
@@ -66,17 +66,10 @@ describe('BaseFileService functional test', () => {
     assert.strictEqual(expect, result);
   });
 
-  it('Should write array to local dir', async () => {
-    const array = ['object-1.txt', 'object-2.jpg'];
-
-    const result = await instance.writeArrayToLocalDir(array);
-
-    assert.strictEqual(result.indexOf('_ObjectLists') > 0, true);
-  });
-
   it('Should clean up a temp file', done => {
 
-    fs.writeFileSync(`${instance.getTempDir()}/test-file.txt`, 'Test content');
+    // Use a synchronous function for debug/testing only
+    fs.writeFileSync(`${instance.getLocalDir()}/test-file.txt`, 'Test content');
     assert.doesNotThrow(exists);
 
     instance
@@ -89,7 +82,7 @@ describe('BaseFileService functional test', () => {
   });
 
   function exists() {
-    fs.accessSync(instance.getTempDir() + '/test-file.txt', F_OK);
+    fs.accessSync(instance.getLocalDir() + '/test-file.txt', F_OK);
   }
 
 
