@@ -14,6 +14,9 @@ describe('TrendMicroFileAction function test', () => {
   let s3Service: AwsS3Service;
   let instance: TrendMicroFileAction;
   const fileName = '_path_to_object';
+  const bucket = `${process.env.BUCKET}`;
+  let keys: string[];
+  let summaryFileName: string;
 
   beforeEach(() => {
     kmsOptions = {
@@ -22,8 +25,7 @@ describe('TrendMicroFileAction function test', () => {
 
     s3Options = {
       localDir: `${__dirname}/tmp`
-    }
-
+    };
 
     const config: testConfig = {
       accessKeyId: `${process.env.ACCESS_KEY_ID}`,
@@ -45,14 +47,25 @@ describe('TrendMicroFileAction function test', () => {
   });
 
 
+  it('should download all objects and get keys', async () => {
+
+    const result = await instance.downloadAllObjects(bucket);
+    assert.strictEqual(result.length > 0, true);
+    keys = result;
+  });
+
   it('should encrypt', async () => {
 
-
+    const result = await instance.encryptSummaryFile(bucket, keys);
+    summaryFileName = result;
   });
 
   it('should decrypt', async () => {
+    const expected = keys.join('\n');
 
-
+    const result = await instance.decryptSummaryFile(summaryFileName);
+    // console.log(result);
+    assert.strictEqual(result, expected);
   });
 
 

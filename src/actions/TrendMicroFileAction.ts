@@ -32,7 +32,9 @@ export class TrendMicroFileAction {
         }
       });
     }
-    return dest;
+
+    // TODO: return object better? {path, fileName}
+    return fileName;
   }
 
   public async decryptSummaryFile(fileName: string): Promise<string> {

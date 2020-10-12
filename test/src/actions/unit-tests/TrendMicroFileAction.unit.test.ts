@@ -58,7 +58,7 @@ describe('TrendMicroFileAction unit test', () => {
     kmsService.encrypt = async () => expect;
 
     const result = await instance.encryptSummaryFile(bucket, keys, fileName);
-    assert.deepStrictEqual(result, expect);
+    assert.deepStrictEqual(result, fileName);
   });
 
   it('Should decrypt a summary file for a list of downloaded files', async () => {
