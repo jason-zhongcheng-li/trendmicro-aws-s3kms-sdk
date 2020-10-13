@@ -3,7 +3,7 @@ import { DateTime } from 'luxon';
 import * as path from 'path';
 import { F_OK } from 'constants';
 import { Readable } from 'stream';
-import { E_LOCALDIR_UNDEFINED, E_LOCALDIR_UNWRITABLE } from '../messages';
+import { E_LOCALDIR_UNDEFINED, E_LOCALDIR_UNWRITABLE, E_FILE_EXIST } from '../messages';
 
 export interface FileOptions {
   localDir: string;
@@ -45,7 +45,7 @@ export class BaseFileService<O extends FileOptions> {
    */
   public async saveToLocalDir(stream: Readable, fileName: string): Promise<string> {
     return new Promise<string>((resolve, reject) => {
-      const dest: string = path.join(this.options.localDir, fileName);
+      const dest: string = this.concatFullPath(fileName);
 
       // A readable stream to be piped into the destination
       stream
@@ -55,38 +55,69 @@ export class BaseFileService<O extends FileOptions> {
     });
   }
 
-  // TODO: remove? not in use?
+
   /**
-   * @param  {string[]} array
-   * @param  {string} fileName? - optional args
-   * @returns {Promise<string>} return local path where summary file is saved
+   * Custom read file async function.
+   * Although fs.readFile() is an async function, additional logic is needed to promisify
+   *
+   * @param  {string} fileName
+   * @returns {Promise<string>} return plain data in the file
    */
-  public async writeArrayToLocalDir(array: string[], fileName?: string): Promise<string> {
+  public async readFromFileAsync(fileName: string): Promise<string> {
 
-    if (!fileName) {
-      const nowStr = DateTime.local().toFormat('yyyy-MM-dd_hh-mm-ss');
-      fileName = nowStr.concat('_ObjectLists.txt');
-    }
-
-    const dest = path.join(this.options.localDir, fileName);
-    const writeStream = fs.createWriteStream(dest);
+    const dest = this.concatFullPath(fileName);
 
     return new Promise<string>((resolve, reject) => {
-      // write each value of the array on the file breaking line
-      array.forEach(value => writeStream.write(`${value}\n`));
-
-      // the finish event is emitted when all data has been flushed from the stream
-      writeStream.on('finish', () => {
-        resolve(dest);
+      fs.readFile(dest, async (err, data) => {
+        if (!!err) {
+          console.error('Read file error in BaseFileService class');
+          reject(err);
+        } else {
+          resolve(data.toString());
+        }
       });
+    });
+  }
 
-      // handle the errors on the write process
-      writeStream.on('error', err => {
-        reject(err);
+
+  /**
+   * Custom write file async function.
+   * Although fs.readFile() is an async function, additional logic is needed to promisify
+   *
+   * @param  {string} fileName
+   * @param  {string} data - Data to be written into the file
+   * @param  {boolean=true} replace - Should replace existing file or not
+   */
+  public async writeToFileAsync(fileName: string, data: string, replace: boolean = true): Promise<string> {
+
+    const dest = this.concatFullPath(fileName);
+
+    // If replace is false, we need to check if file with same file name exists or not
+    if (!replace) {
+      const fileExist = await this.isFileExistAsync(dest)
+        .catch(e => {
+          // have to handled rejection by rejecting a promise
+          console.error(e);
+          return 'error';
+        });
+
+      // In this case we dont allow to replace existing file
+      if (fileExist) {
+        return new Promise<string>((resolve, reject) => {
+          reject(E_FILE_EXIST);
+        });
+      }
+    }
+
+    return new Promise<string>((resolve, reject) => {
+      fs.writeFile(dest, data, err => {
+        if (!!err) {
+          console.error('Write file error: ', err);
+          reject(err);
+        } else {
+          resolve(fileName);
+        }
       });
-
-      // close the stream
-      writeStream.end();
     });
   }
 
@@ -109,5 +140,25 @@ export class BaseFileService<O extends FileOptions> {
         }
       });
     });
+  }
+
+  /**
+   * Validate if file exist in destination
+   * @param  {string} path
+   */
+  private isFileExistAsync(path: string): Promise<boolean> {
+    return new Promise<boolean>((resolve, reject) => {
+      fs.exists(path, exists => {
+        resolve(exists);
+      });
+    });
+  }
+
+  /**
+   * Concatenate full path fo the file we are going to read/write
+   * @param  {string} fileName
+   */
+  private concatFullPath(fileName: string): string {
+    return path.join(this.options.localDir, fileName);
   }
 }

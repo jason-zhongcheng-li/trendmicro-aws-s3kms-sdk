@@ -4,7 +4,7 @@ import * as rimraf from 'rimraf';
 import { F_OK } from 'constants';
 import { Readable } from 'stream';
 import { FileOptions, BaseFileService } from '../../../../src/services/BaseFileService';
-import { E_LOCALDIR_UNDEFINED, E_LOCALDIR_UNWRITABLE } from '../../../../src/messages';
+import { E_LOCALDIR_UNDEFINED, E_LOCALDIR_UNWRITABLE, E_FILE_EXIST } from '../../../../src/messages';
 
 describe('BaseFileService unit test', () => {
   let options: FileOptions;
@@ -62,27 +62,46 @@ describe('BaseFileService unit test', () => {
     };
 
     const result = await instance.saveToLocalDir(stream, 'test-file.txt');
-    assert.doesNotThrow(exists);
+    assert.doesNotThrow(() => exists('test-file.txt'));
     assert.strictEqual(expect, result);
+  });
+
+  it('Should async write a file', async () => {
+    const expect = 'Should async write a file';
+    const fileName = 'async_write_file_name.txt';
+
+    const result = await instance.writeToFileAsync(fileName, expect);
+
+    assert.strictEqual(result, fileName);
+  });
+
+  it('Should throw error if async write an exist file with no replace', async () => {
+    const expect = 'Should async write a file';
+    const fileName = 'async_write_file_name.txt';
+
+    assert.rejects(async () => {
+      await instance.writeToFileAsync(fileName, expect, false);
+    }, new RegExp(E_FILE_EXIST));
+
   });
 
   it('Should clean up a temp file', done => {
 
     // Use a synchronous function for debug/testing only
     fs.writeFileSync(`${instance.getLocalDir()}/test-file.txt`, 'Test content');
-    assert.doesNotThrow(exists);
+    assert.doesNotThrow(() => exists('test-file.txt'));
 
     instance
       .cleanUpLocalFile('test-file.txt')
       .then(() => {
-        assert.throws(exists);
+        assert.throws(() => exists('test-file.txt'));
         done();
       })
       .catch(done);
   });
 
-  function exists() {
-    fs.accessSync(instance.getLocalDir() + '/test-file.txt', F_OK);
+  function exists(fileName: string) {
+    fs.accessSync(instance.getLocalDir().concat('/', fileName), F_OK);
   }
 
 
