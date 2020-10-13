@@ -1,23 +1,18 @@
+import * as assert from 'assert';
 import { testConfig } from './../../testConfig';
 import { KMSFileOptions, AwsKMSService } from './../../../../src/services/AwsKMSService';
 import { KMS } from 'aws-sdk';
-import * as assert from 'assert';
-import * as sysPath from 'path';
-import * as fs from 'fs';
 
 describe('AwsKMSService function test', () => {
   let options: KMSFileOptions;
   let kms: KMS;
   let instance: AwsKMSService;
-  const fileName = '_path_to_object';
-  let localDir: string;
+  const plainText = 'def456';
 
   beforeEach(() => {
     options = {
       KeyId: `${process.env.KEY_ID}`
     };
-
-    localDir = `${__dirname}/tmp`;
 
     const config = {
       accessKeyId: `${process.env.ACCESS_KEY_ID}`,
@@ -25,40 +20,25 @@ describe('AwsKMSService function test', () => {
       region: `${process.env.REGION}`
     } as testConfig;
 
-    kms = new KMS(config) as KMS;
+    kms = new KMS(config);
 
     instance = new AwsKMSService(options, kms);
-
-    // Use a synchronous function for debug/testing only
-    fs.writeFileSync(sysPath.join(localDir, fileName), 'def456');
-
   });
 
 
-  it('should encrypt', async () => {
+  it('should encrypt and decrypt plain text', async () => {
 
-    const filePath = sysPath.join(localDir, fileName);
-    const rawData = fs.readFileSync(filePath);
-    const data = await instance.encrypt(rawData);
-    const path = sysPath.join(localDir, 'encrypt.txt');
+    // convert string value to buffer
+    const buffData = Buffer.from(plainText);
 
-    // Use a synchronous function for debug/testing only
-    fs.writeFileSync(path, data);
+    // encrypt buffer data
+    const data = await instance.encrypt(buffData);
 
-    assert.strictEqual(data.length > 0, true);
+    assert.strictEqual(data.length > 0, true, 'should get encrypt data');
+
+    // decrypt data returned by instance.encrypt() function above
+    const result = await instance.decrypt(data);
+
+    assert.strictEqual(result, plainText, 'should be plain text');
   });
-
-  it('should decrypt', async () => {
-
-    const filePath = sysPath.join(localDir, 'encrypt.txt');
-
-    // Use a synchronous function for debug/testing only
-    const rawData = fs.readFileSync(filePath, 'utf-8');
-
-    const result = await instance.decrypt(rawData);
-
-    assert.strictEqual(result, 'def456');
-  });
-
-
 });
