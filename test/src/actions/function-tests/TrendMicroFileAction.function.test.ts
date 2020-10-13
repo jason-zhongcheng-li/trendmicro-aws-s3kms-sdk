@@ -41,7 +41,7 @@ describe('TrendMicroFileAction function test', () => {
 
     instance = new TrendMicroFileAction(s3Service, kmsService);
 
-    // Use a synchronous function for debug/testing only
+    // Use a synchronous function provided by fs for debug/testing only
     fs.writeFileSync(sysPath.join(s3Options.localDir, fileName), 'def456');
 
   });

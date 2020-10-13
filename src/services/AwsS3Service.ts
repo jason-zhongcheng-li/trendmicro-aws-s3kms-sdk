@@ -27,19 +27,21 @@ export class AwsS3Service extends BaseFileService<S3FileOptions> {
    * @returns {Promise<string>} - The file path to the local file
    */
   public async getFile(bucket: string, key: string): Promise<string> {
+
     const params: GetObjectRequest = {
       Bucket: bucket,
       Key: key
     };
 
     const stream = this.s3.getObject(params).createReadStream();
+
     // Save downloaded file to local path
     const result = await this.saveToLocalDir(stream, key)
       .catch(e => {
+        // catch error for promisify to avoid unhandled rejection exception
         console.error(e);
         return 'Error on saveToLocalDir';
       });
-    // console.log('path in service = ', result);
     return result;
   }
 
@@ -51,7 +53,7 @@ export class AwsS3Service extends BaseFileService<S3FileOptions> {
    * @returns {Promise<string[]>} - All the keys in a S3 bucket
    */
   public async getAllKeys(bucket: string): Promise<string[]> {
-    const keys = [] as string[];
+    const keys: string[] = [];
     let IsTruncated = false;
     let NextContinuationToken = '';
     let StartAfter = '';

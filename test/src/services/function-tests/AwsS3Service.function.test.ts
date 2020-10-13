@@ -1,11 +1,9 @@
-import { S3FileOptions, AwsS3Service } from './../../../../src/services/AwsS3Service';
-
-import { S3 } from 'aws-sdk';
-import * as path from 'path';
 import * as assert from 'assert';
-
-import AWS = require('aws-sdk');
+import * as path from 'path';
+import { S3 } from 'aws-sdk';
+import { S3FileOptions, AwsS3Service } from './../../../../src/services/AwsS3Service';
 import { testConfig } from '../../testConfig';
+
 
 describe('AwsS3Service functional test', async () => {
   let options: S3FileOptions;
@@ -28,7 +26,7 @@ describe('AwsS3Service functional test', async () => {
     };
 
     // Create S3 service object
-    s3 = new AWS.S3(config);
+    s3 = new S3(config);
 
     instance = new AwsS3Service(options, s3);
   });
@@ -37,7 +35,7 @@ describe('AwsS3Service functional test', async () => {
   it('should get objects key', async () => {
     const result = await instance.getAllKeys(bucket);
 
-    assert.strictEqual(result.length > 0, true);
+    assert.strictEqual(result.length > 0, true, 'should a list of keys');
 
     // set key for getFile Functional test
     key = result[0];
@@ -47,6 +45,6 @@ describe('AwsS3Service functional test', async () => {
     const expect = path.join(options.localDir, key);
     const result = await instance.getFile(bucket, key);
 
-    assert.strictEqual(result, expect);
+    assert.strictEqual(result, expect, 'should get local full path of downloaded file');
   });
 });

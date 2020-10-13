@@ -26,7 +26,7 @@ describe('TrendMicroFileAction unit test', () => {
       return ['object-1.txt', 'object-2.jpg'];
     };
 
-    // it's used to mark the number of function called
+    // it's used to mark the number of function has been called
     let numCalls = 0;
 
     s3Service.getFile = async (param1, param2) => {

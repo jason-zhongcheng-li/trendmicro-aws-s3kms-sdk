@@ -87,7 +87,7 @@ describe('BaseFileService unit test', () => {
 
   it('Should clean up a temp file', done => {
 
-    // Use a synchronous function for debug/testing only
+    // Use a synchronous function provided by fs for debug/testing only
     fs.writeFileSync(`${instance.getLocalDir()}/test-file.txt`, 'Test content');
     assert.doesNotThrow(() => exists('test-file.txt'));
 
@@ -101,8 +101,7 @@ describe('BaseFileService unit test', () => {
   });
 
   function exists(fileName: string) {
+    // Use a synchronous function provided by fs for debug/testing only
     fs.accessSync(instance.getLocalDir().concat('/', fileName), F_OK);
   }
-
-
 });
