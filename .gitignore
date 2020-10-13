@@ -9,6 +9,10 @@
 # Ignore credential info in local env
 /.env
 
+/.nyc_output
+
+/coverage
+
 # Installed libs
 /node_modules
 
