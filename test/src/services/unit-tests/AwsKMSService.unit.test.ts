@@ -1,6 +1,6 @@
 import { KMS, Request } from 'aws-sdk';
 import * as assert from 'assert';
-import { CiphertextType, EncryptResponse, DecryptResponse } from 'aws-sdk/clients/kms';
+import { CiphertextType, EncryptResponse, DecryptResponse, EncryptRequest } from 'aws-sdk/clients/kms';
 import { AwsKMSService, KMSFileOptions } from '../../../../src/services/AwsKMSService';
 import { E_KMS_KEYID_UNDEFINED } from '../../../../src/messages';
 
@@ -22,12 +22,6 @@ describe('AwsKMSService unit test', async () => {
     instance = new AwsKMSService(options, kms);
   });
 
-  after(async () => {
-    CiphertextBlob.toString = () => {
-      return 'abc123';
-    };
-  });
-
   it('should throw if `options.KeyId` is missing in the constructor', () => {
     assert.throws(() => {
       instance = new AwsKMSService({ KeyId: '', localDir: __dirname + '/tmp' } as KMSFileOptions, kms);
@@ -38,6 +32,7 @@ describe('AwsKMSService unit test', async () => {
     const expect: string = 'OMgoNDMpVOIuDmMNlvviw9Jk+K1zBTYUYbEA==';
     const data: Buffer = Buffer.from('test-data', 'base64');
 
+    // mock kms.encrypt function and return a mocked callback function named promise()
     kms.encrypt = () => {
       const res: EncryptResponse = { CiphertextBlob };
 
@@ -46,7 +41,7 @@ describe('AwsKMSService unit test', async () => {
       };
     };
 
-    CiphertextBlob.toString = param => {
+    CiphertextBlob.toString = () => {
       return 'OMgoNDMpVOIuDmMNlvviw9Jk+K1zBTYUYbEA==';
     };
 
@@ -58,6 +53,7 @@ describe('AwsKMSService unit test', async () => {
     const expect: string = 'test-data';
     const data: string = 'OMgoNDMpVOIuDmMNlvviw9Jk+K1zBTYUYbEA==';
 
+    // mock kms.decrypt function and return a mocked callback function named promise()
     kms.decrypt = () => {
       const res: DecryptResponse = { Plaintext };
 

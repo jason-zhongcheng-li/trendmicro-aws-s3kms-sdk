@@ -5,6 +5,7 @@ import { Readable } from 'stream';
 import { ListObjectsV2Output } from 'aws-sdk/clients/s3';
 import { S3FileOptions, AwsS3Service } from '../../../../src/services/AwsS3Service';
 import { E_BUCKET_UNDEFINED } from '../../../../src/messages';
+import { CiphertextType } from 'aws-sdk/clients/kms';
 
 describe('AwsS3Service unit test', async () => {
   let options: S3FileOptions;
@@ -13,6 +14,7 @@ describe('AwsS3Service unit test', async () => {
   const key = 'test-data';
   const textContent = 'abc123';
   const bucket = 's3-bucket';
+  let CiphertextBlob: CiphertextType;
 
   beforeEach(async () => {
     options = {
@@ -23,11 +25,13 @@ describe('AwsS3Service unit test', async () => {
       MaxKeys: 2
     };
     s3 = Object.assign(S3.prototype);
+    CiphertextBlob = Object.assign(Buffer.prototype);
     instance = new AwsS3Service(options, s3);
   });
 
   it('should get a file from AWS bucket', async () => {
 
+    // mock s3.getObject() function and return a mocked callback function named createReadStream()
     s3.getObject = () => {
       const stream = new Readable({ objectMode: true });
 
@@ -41,10 +45,12 @@ describe('AwsS3Service unit test', async () => {
       };
     };
 
+    CiphertextBlob.toString = () => {
+      return 'abc123';
+    };
+
     const filePath = await instance.getFile(bucket, key);
     const result = fs.readFileSync(filePath, 'utf-8');
-    // console.log('filePath = ', filePath);
-    // console.log('result in S3 = ', result);
 
     assert.strictEqual(result, textContent, 'should be the file sent by the dummy stream');
 
@@ -52,8 +58,13 @@ describe('AwsS3Service unit test', async () => {
 
   it('should get all keys in a bucket if any', async () => {
     const expect: string[] = ['test1-file.jpg', 'test2-file.jpg', 'test3-file.jpg'];
+
+    // it's used to mark the number of function has been called
     let numCalls = 0;
+
+    // mock s3.listObjectsV2() function and return a mocked callback function named promise()
     s3.listObjectsV2 = () => {
+
       numCalls++;
 
       if (numCalls === 1) {
