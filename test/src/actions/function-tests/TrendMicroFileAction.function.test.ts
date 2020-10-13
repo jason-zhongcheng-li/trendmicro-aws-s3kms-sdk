@@ -48,15 +48,17 @@ describe('TrendMicroFileAction function test', () => {
 
 
   it('should download all objects and get keys', async () => {
-
     const result = await instance.downloadAllObjects(bucket);
     assert.strictEqual(result.length > 0, true);
+
+    // assign result (array of the keys) to keys variable to be used in following tests
     keys = result;
   });
 
   it('should encrypt', async () => {
-
     const result = await instance.encryptSummaryFile(bucket, keys);
+
+    // assign result to summaryFileName variable to be used in following tests
     summaryFileName = result;
   });
 
@@ -64,7 +66,7 @@ describe('TrendMicroFileAction function test', () => {
     const expected = keys.join('\n');
 
     const result = await instance.decryptSummaryFile(summaryFileName);
-    // console.log(result);
+
     assert.strictEqual(result, expected);
   });
 
