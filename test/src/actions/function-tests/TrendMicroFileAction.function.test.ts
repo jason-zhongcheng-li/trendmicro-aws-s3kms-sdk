@@ -4,7 +4,7 @@ import * as fs from 'fs';
 import { AwsS3Service, S3FileOptions } from './../../../../src/services/AwsS3Service';
 import { testConfig } from './../../testConfig';
 import { KMSFileOptions, AwsKMSService } from './../../../../src/services/AwsKMSService';
-import { KMS, S3, S3Outposts } from 'aws-sdk';
+import { KMS, S3 } from 'aws-sdk';
 import { TrendMicroFileAction } from '../../../../src/actions/TrendMicroFileAction';
 
 describe('TrendMicroFileAction function test', () => {

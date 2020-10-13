@@ -11,10 +11,8 @@ describe('TrendMicroFileAction unit test', () => {
   const bucket: string = 's3-bucket';
   const fileName: string = 'file-name';
   const keys: string[] = ['object-1', 'object-2'];
-  const localDir: string = `${__dirname}/tmp`;
 
   beforeEach(() => {
-
     s3Service = Object.create(AwsS3Service.prototype);
     kmsService = Object.create(AwsKMSService.prototype);
     instance = new TrendMicroFileAction(s3Service, kmsService);
@@ -28,6 +26,7 @@ describe('TrendMicroFileAction unit test', () => {
       return ['object-1.txt', 'object-2.jpg'];
     };
 
+    // it's used to mark the number of function called
     let numCalls = 0;
 
     s3Service.getFile = async (param1, param2) => {
@@ -36,10 +35,12 @@ describe('TrendMicroFileAction unit test', () => {
 
       numCalls++;
 
+      // function is called in a loop so the arguments will be different
+      // it is called twrice only due to the length of keys returned by s3Service.getAllKeys
       if (numCalls === 1) {
         assert.strictEqual(param2, expect[0], 'download the first object');
         return 'the-first-object-path';
-      } else {
+      } else if (numCalls === 2) {
         assert.strictEqual(param2, expect[1], 'download the second object');
         return 'the-second-object-path';
       }
@@ -58,6 +59,7 @@ describe('TrendMicroFileAction unit test', () => {
       assert.strictEqual(Buffer.isBuffer(param), true);
       return encryptedData;
     };
+
     s3Service.writeToFileAsync = async (param1, param2) => {
       assert.strictEqual(param1, fileName, 'should be fine name');
       assert.strictEqual(param2, encryptedData, 'should be encrypted data');
@@ -76,6 +78,7 @@ describe('TrendMicroFileAction unit test', () => {
       assert.strictEqual(param, fileName, 'should be the file name');
       return encryptedData;
     };
+
     kmsService.decrypt = async param => {
       assert.strictEqual(param, encryptedData);
       return expect;
