@@ -8,68 +8,64 @@ export class TrendMicroFileAction {
   constructor(private s3Service: AwsS3Service, private kmsService: AwsKMSService) {
   }
 
+
+  /**
+   * Encrypt plain text of the list of downloaded files to a local file
+   *
+   * @param  {string} bucket - Bucket on AWS S3
+   *
+   * @param  {string[]} keys?
+   * - An array of the keys of downloaded files, the key is file name in the S3 bucket.
+   * This param is optional, if you have got keys to encrypt, this function will not download files from bucket.
+   * Otherwise, it will download all files from the bucket before create an summary file with encrypt data.
+   *
+   * @param  {string} fileName?
+   * - It is the name of summary file where you want to save encrypt data of the list of downloaded files
+   * This param is optional, if you dont specify the file name, the default format of file name will be yyyy-MM-dd_hh-mm-ss_ObjectsList.txt
+   */
   public async encryptSummaryFile(bucket: string, keys?: string[], fileName?: string): Promise<string> {
 
+    // Downloaded all objects(files) from bucket if no keys available to encrypt.
     if (!keys) {
       keys = await this.downloadAllObjects(bucket);
     }
 
+    if (!keys) {
+      // TODO:
+    }
+
+    // Create default file name if fileName is not specified.
     if (!fileName) {
       const nowStr = DateTime.local().toFormat('yyyy-MM-dd_hh-mm-ss');
       fileName = nowStr.concat('_ObjectsList.txt');
     }
 
-    const dest = path.join(this.s3Service.getLocalDir(), fileName);
-
+    // Convert string of keys with new line to buffer
     const bufferData = Buffer.from(keys.join('\n').toString());
 
+    // Encrypt data
     const encryptedData = await this.kmsService.encrypt(bufferData);
-    // console.log('encryptedData = ', encryptedData);
-    if (!!encryptedData) {
-      fs.writeFile(dest, encryptedData, err => {
-        if (!!err) {
-          console.error('Write file error: ', err);
-        }
-      });
-    }
 
-    // TODO: return object better? {path, fileName}
-    return fileName;
-  }
-
-  public async decryptSummaryFile(fileName: string): Promise<string> {
-    const dest = path.join(this.s3Service.getLocalDir(), fileName);
-
-    // let rawData = '';
-    // await Promise.resolve(fs.readFile(dest, (err, data) => {
-    //   if (!!err) {
-    //     console.error(err);
-    //   } else {
-    //     rawData = data.toString();
-    //   }
-
-    // }));
-    const data = await new Promise<string>((resolve, reject) => {
-      fs.readFile(dest, async (err, data) => {
-        if (!!err) {
-          console.error('Read file error in decryptSummaryFile()');
-          reject(err);
-        } else {
-          resolve(data.toString());
-        }
-      });
-    });
-
-    // console.log('data in function = ', data);
-
-
-    const result = await this.kmsService.decrypt(data);
-    return result;
+    return await this.s3Service.writeToFileAsync(fileName, encryptedData);
   }
 
   /**
+   * Decrypt content to plain text
+   * @param  {string} fileName
+   * @returns {Promise<string[]>} - raw data
+   */
+  public async decryptSummaryFile(fileName: string): Promise<string> {
+
+    // read data from the file to decrypt
+    const data = await this.s3Service.readFromFileAsync(fileName);
+
+    return await this.kmsService.decrypt(data);
+  }
+
+  /**
+   * Download all objects and return all the keys in a S3 bucket
    * @param  {string} bucket
-   * @returns {Promise<string[]>} - Download all objects and return all the keys in a S3 bucket
+   * @returns {Promise<string[]>} - array of the keys downloaded
    */
   public async downloadAllObjects(bucket: string): Promise<string[]> {
     const result: string[] = [];

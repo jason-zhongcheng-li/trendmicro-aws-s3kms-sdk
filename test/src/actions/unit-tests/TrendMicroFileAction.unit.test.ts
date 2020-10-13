@@ -52,20 +52,34 @@ describe('TrendMicroFileAction unit test', () => {
   });
 
   it('Should encrypt a summary file for a list of downloaded files', async () => {
-    const expect = localDir.concat('/', fileName);
+    const encryptedData = 'XEppcMp4Qa2VBoovOpHSaR9eMPTqScjaeWaTMjQq/o=';
 
-    s3Service.getLocalDir = () => localDir;
-    kmsService.encrypt = async () => expect;
+    kmsService.encrypt = async param => {
+      assert.strictEqual(Buffer.isBuffer(param), true);
+      return encryptedData;
+    };
+    s3Service.writeToFileAsync = async (param1, param2) => {
+      assert.strictEqual(param1, fileName, 'should be fine name');
+      assert.strictEqual(param2, encryptedData, 'should be encrypted data');
+      return fileName;
+    };
 
     const result = await instance.encryptSummaryFile(bucket, keys, fileName);
     assert.deepStrictEqual(result, fileName);
   });
 
   it('Should decrypt a summary file for a list of downloaded files', async () => {
+    const encryptedData = 'XEppcMp4Qa2VBoovOpHSaR9eMPTqScjaeWaTMjQq/o=';
     const expect = 'raw-data';
 
-    s3Service.getLocalDir = () => localDir;
-    kmsService.decrypt = async () => expect;
+    s3Service.readFromFileAsync = async param => {
+      assert.strictEqual(param, fileName, 'should be the file name');
+      return encryptedData;
+    };
+    kmsService.decrypt = async param => {
+      assert.strictEqual(param, encryptedData);
+      return expect;
+    };
 
     const result = await instance.decryptSummaryFile(fileName);
     assert.deepStrictEqual(result, expect);
