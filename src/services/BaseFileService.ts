@@ -95,10 +95,11 @@ export class BaseFileService<O extends FileOptions> {
     // If replace is false, we need to check if file with same file name exists or not
     if (!replace) {
       const fileExist = await this.isFileExistAsync(dest)
-        .catch(e => {
+        .catch(err => {
           // have to handled rejection by rejecting a promise
-          console.error(e);
-          return 'error';
+          process.nextTick(
+            () => { throw new Error(err); }
+          );
         });
 
       // In this case we dont allow to replace existing file

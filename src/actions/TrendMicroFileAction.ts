@@ -77,7 +77,12 @@ export class TrendMicroFileAction {
     // use Promise.all() to make sure arry push key after async getFile() function done.
     await Promise.all(
       keys.map(async key => {
-        const destPath = await this.s3Service.getFile(bucket, key).catch(err => console.error(err));
+        const destPath = await this.s3Service.getFile(bucket, key)
+          .catch(err => {
+            process.nextTick(
+              () => { throw new Error(err); }
+            );
+          });
         if (!!destPath) {
           result.push(key);
         }

@@ -37,10 +37,11 @@ export class AwsS3Service extends BaseFileService<S3FileOptions> {
 
     // Save downloaded file to local path
     const result = await this.saveToLocalDir(stream, key)
-      .catch(e => {
-        // catch error for promisify to avoid unhandled rejection exception
-        console.error(e);
-        return 'Error on saveToLocalDir';
+      .catch(err => {
+        process.nextTick(
+          () => { throw new Error(err); }
+        );
+        return null;
       });
     return result;
   }
@@ -87,8 +88,8 @@ export class AwsS3Service extends BaseFileService<S3FileOptions> {
           // Break the loop since there is no more key
           break;
         }
-      } catch (error) {
-        throw error;
+      } catch (err) {
+        throw new Error(err);
       }
     }
     return keys;
