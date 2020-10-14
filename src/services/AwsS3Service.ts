@@ -38,10 +38,7 @@ export class AwsS3Service extends BaseFileService<S3FileOptions> {
     // Save downloaded file to local path
     const result = await this.saveToLocalDir(stream, key)
       .catch(err => {
-        process.nextTick(
-          () => { throw new Error(err); }
-        );
-        return null;
+        return new Promise<string>(rej => rej(err));
       });
     return result;
   }

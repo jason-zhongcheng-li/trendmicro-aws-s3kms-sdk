@@ -3,6 +3,7 @@ import { DateTime } from 'luxon';
 import * as path from 'path';
 import { AwsS3Service } from './../services/AwsS3Service';
 import { AwsKMSService } from './../services/AwsKMSService';
+import { statusCode } from 'aws-sdk/clients/mediastoredata';
 
 export class TrendMicroFileAction {
   constructor(private s3Service: AwsS3Service, private kmsService: AwsKMSService) {
@@ -71,23 +72,25 @@ export class TrendMicroFileAction {
     const result: string[] = [];
 
     // Get all keys of objects in the bucket
-    const keys = await this.s3Service.getAllKeys(bucket);
+    const keys = await this.s3Service.getAllKeys(bucket)
+      .catch(err => {
+        return new Promise<string[]>(rej => rej(err));
+      });
 
     // Download one by one
     // use Promise.all() to make sure arry push key after async getFile() function done.
-    await Promise.all(
-      keys.map(async key => {
-        const destPath = await this.s3Service.getFile(bucket, key)
-          .catch(err => {
-            process.nextTick(
-              () => { throw new Error(err); }
-            );
-          });
-        if (!!destPath) {
-          result.push(key);
-        }
-      }));
-
+    if (Array.isArray(keys)) {
+      await Promise.all(
+        keys.map(async key => {
+          const destPath = await this.s3Service.getFile(bucket, key)
+            .catch(err => {
+              return new Promise<string>(rej => rej(err));
+            });
+          if (!!destPath) {
+            result.push(key);
+          }
+        }));
+    }
     return result;
   }
 }

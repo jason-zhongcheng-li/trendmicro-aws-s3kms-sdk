@@ -97,9 +97,7 @@ export class BaseFileService<O extends FileOptions> {
       const fileExist = await this.isFileExistAsync(dest)
         .catch(err => {
           // have to handled rejection by rejecting a promise
-          process.nextTick(
-            () => { throw new Error(err); }
-          );
+          return new Promise<boolean>(rej => rej(err));
         });
 
       // In this case we dont allow to replace existing file

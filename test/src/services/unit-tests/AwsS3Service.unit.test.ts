@@ -1,11 +1,12 @@
 import { S3, Request } from 'aws-sdk';
 import * as assert from 'assert';
-import * as fs from 'fs';
 import { Readable } from 'stream';
 import { ListObjectsV2Output } from 'aws-sdk/clients/s3';
 import { S3FileOptions, AwsS3Service } from '../../../../src/services/AwsS3Service';
-import { E_BUCKET_UNDEFINED } from '../../../../src/messages';
 import { CiphertextType } from 'aws-sdk/clients/kms';
+import { expect } from 'chai';
+import chaiAsPromised = require('chai-as-promised');
+import chai = require('chai');
 
 describe('AwsS3Service unit test', async () => {
   let options: S3FileOptions;
@@ -17,6 +18,7 @@ describe('AwsS3Service unit test', async () => {
   let CiphertextBlob: CiphertextType;
 
   beforeEach(async () => {
+    chai.use(chaiAsPromised);
     options = {
       ACL: 'private',
       ServerSideEncryption: 'AES256',
@@ -30,6 +32,8 @@ describe('AwsS3Service unit test', async () => {
   });
 
   it('should get a file from AWS bucket', async () => {
+
+    const expect = 'local-path';
 
     // mock s3.getObject() function and return a mocked callback function named createReadStream()
     s3.getObject = () => {
@@ -49,10 +53,15 @@ describe('AwsS3Service unit test', async () => {
       return 'abc123';
     };
 
-    const filePath = await instance.getFile(bucket, key);
-    const result = fs.readFileSync(filePath, 'utf-8');
+    instance.saveToLocalDir = async (param1, param2) => {
+      assert.strictEqual(param2, key, 'should be the key to download');
+      return expect;
+    };
 
-    assert.strictEqual(result, textContent, 'should be the file sent by the dummy stream');
+    const filePath = await instance.getFile(bucket, key);
+    // const result = fs.readFileSync(filePath, 'utf-8');
+
+    assert.strictEqual(filePath, expect, 'should be the local path');
 
   });
 
@@ -99,5 +108,32 @@ describe('AwsS3Service unit test', async () => {
 
     assert.deepStrictEqual(result, expect, 'should be all the keys in bucket');
 
+  });
+
+  it('Should catch an error when saving to local throws exception', async () => {
+    // mock s3.getObject() function and return a mocked callback function named createReadStream()
+    const expectedError = new Error('Save to local');
+    s3.getObject = () => {
+      const stream = new Readable({ objectMode: true });
+
+      stream._read = () => {
+        stream.push(textContent);
+        stream.push(null);
+      };
+
+      return <Request<any, any>>{
+        createReadStream: () => stream
+      };
+    };
+
+    CiphertextBlob.toString = () => {
+      return 'abc123';
+    };
+
+    instance.saveToLocalDir = async () => {
+      throw expectedError;
+    };
+
+    await expect(instance.getFile(bucket, key)).to.eventually.deep.equals(expectedError);
   });
 });

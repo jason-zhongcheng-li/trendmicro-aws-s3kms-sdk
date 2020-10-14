@@ -1,8 +1,11 @@
+'use strict';
 import * as assert from 'assert';
 import { AwsKMSService } from '../../../../src/services/AwsKMSService';
 import { AwsS3Service } from '../../../../src/services/AwsS3Service';
 import { TrendMicroFileAction } from './../../../../src/actions/TrendMicroFileAction';
-
+import { expect } from 'chai';
+import chaiAsPromised = require('chai-as-promised');
+import chai = require('chai');
 
 describe('TrendMicroFileAction unit test', () => {
   let s3Service: AwsS3Service;
@@ -13,6 +16,7 @@ describe('TrendMicroFileAction unit test', () => {
   const keys: string[] = ['object-1', 'object-2'];
 
   beforeEach(() => {
+    chai.use(chaiAsPromised);
     s3Service = Object.create(AwsS3Service.prototype);
     kmsService = Object.create(AwsKMSService.prototype);
     instance = new TrendMicroFileAction(s3Service, kmsService);
@@ -86,5 +90,15 @@ describe('TrendMicroFileAction unit test', () => {
 
     const result = await instance.decryptSummaryFile(fileName);
     assert.deepStrictEqual(result, expect);
+  });
+
+  it('Should handle error for s3Service.getAllKeys()', async () => {
+    const expectedError = new Error('getAllKeys() error');
+    s3Service.getAllKeys = async param => {
+      assert.strictEqual(param, bucket);
+      throw expectedError;
+    };
+    // await expect(instance.downloadAllObjects(bucket)).to.throw(expectedError.message);
+    await expect(instance.downloadAllObjects(bucket)).to.eventually.deep.equals([]);
   });
 });
