@@ -4,6 +4,7 @@ import * as path from 'path';
 import { AwsS3Service } from './../services/AwsS3Service';
 import { AwsKMSService } from './../services/AwsKMSService';
 import { statusCode } from 'aws-sdk/clients/mediastoredata';
+import { E_S3_NO_OBJECTS_IN_BUCKET } from '../messages';
 
 export class TrendMicroFileAction {
   constructor(private s3Service: AwsS3Service, private kmsService: AwsKMSService) {
@@ -24,15 +25,11 @@ export class TrendMicroFileAction {
    * - It is the name of summary file where you want to save encrypt data of the list of downloaded files
    * This param is optional, if you dont specify the file name, the default format of file name will be yyyy-MM-dd_hh-mm-ss_ObjectsList.txt
    */
-  public async encryptSummaryFile(bucket: string, keys?: string[], fileName?: string): Promise<string> {
+  public async encryptSummaryFile(bucket: string, keys: string[] = [], fileName?: string): Promise<string> {
 
     // Downloaded all objects(files) from bucket if no keys available to encrypt.
-    if (!keys) {
+    if (!keys || keys.length === 0) {
       keys = await this.downloadAllObjects(bucket);
-    }
-
-    if (!keys) {
-      // TODO:
     }
 
     // Create default file name if fileName is not specified.
@@ -84,7 +81,7 @@ export class TrendMicroFileAction {
         keys.map(async key => {
           const destPath = await this.s3Service.getFile(bucket, key)
             .catch(err => {
-              return new Promise<string>(rej => rej(err));
+              console.error(err);
             });
           if (!!destPath) {
             result.push(key);

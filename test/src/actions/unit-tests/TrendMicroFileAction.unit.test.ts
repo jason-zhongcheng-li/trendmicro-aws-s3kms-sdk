@@ -6,6 +6,8 @@ import { TrendMicroFileAction } from './../../../../src/actions/TrendMicroFileAc
 import { expect } from 'chai';
 import chaiAsPromised = require('chai-as-promised');
 import chai = require('chai');
+import { E_S3_NO_OBJECTS_IN_BUCKET } from '../../../../src/messages';
+import { resolve } from 'path';
 
 describe('TrendMicroFileAction unit test', () => {
   let s3Service: AwsS3Service;
@@ -59,6 +61,11 @@ describe('TrendMicroFileAction unit test', () => {
   it('Should encrypt a summary file for a list of downloaded files', async () => {
     const encryptedData = 'XEppcMp4Qa2VBoovOpHSaR9eMPTqScjaeWaTMjQq/o=';
 
+    instance.downloadAllObjects = async param => {
+      assert.strictEqual(param, bucket, 'should get keys from bucket');
+      return keys;
+    };
+
     kmsService.encrypt = async param => {
       assert.strictEqual(Buffer.isBuffer(param), true);
       return encryptedData;
@@ -70,7 +77,7 @@ describe('TrendMicroFileAction unit test', () => {
       return fileName;
     };
 
-    const result = await instance.encryptSummaryFile(bucket, keys, fileName);
+    const result = await instance.encryptSummaryFile(bucket, [], fileName);
     assert.deepStrictEqual(result, fileName);
   });
 
@@ -98,7 +105,6 @@ describe('TrendMicroFileAction unit test', () => {
       assert.strictEqual(param, bucket);
       throw expectedError;
     };
-    // await expect(instance.downloadAllObjects(bucket)).to.throw(expectedError.message);
     await expect(instance.downloadAllObjects(bucket)).to.eventually.deep.equals([]);
   });
 });
