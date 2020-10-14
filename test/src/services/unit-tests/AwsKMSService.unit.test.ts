@@ -14,11 +14,14 @@ describe('AwsKMSService unit test', async () => {
   beforeEach(() => {
     options = {
       KeyId: 'key-id',
-      localDir: __dirname + '/tmp'
+      localDir: `${__dirname}/tmp`
     } as KMSFileOptions;
-    kms = Object.assign(KMS.prototype);
-    CiphertextBlob = Object.assign(Buffer.prototype);
-    Plaintext = Object.assign(String.prototype);
+
+    // mock dependency/property/service to call mocked functions
+    kms = Object.create(KMS.prototype);
+    CiphertextBlob = Object.create(Buffer.prototype);
+    Plaintext = Object.create(String.prototype);
+
     instance = new AwsKMSService(options, kms);
   });
 

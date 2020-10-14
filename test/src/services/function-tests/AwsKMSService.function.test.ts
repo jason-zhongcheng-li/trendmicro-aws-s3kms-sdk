@@ -14,12 +14,14 @@ describe('AwsKMSService function test', () => {
       KeyId: `${process.env.KEY_ID}`
     };
 
+    // config AWS options with credentials in .env
     const config = {
       accessKeyId: `${process.env.ACCESS_KEY_ID}`,
       secretAccessKey: `${process.env.SECRET_ACCESS_KEY}`,
       region: `${process.env.REGION}`
     } as testConfig;
 
+    // create KMS instance
     kms = new KMS(config);
 
     instance = new AwsKMSService(options, kms);

@@ -27,15 +27,18 @@ describe('TrendMicroFileAction function test', () => {
       localDir: `${__dirname}/tmp`
     };
 
+    // config AWS options with credentials in .env
     const config: testConfig = {
       accessKeyId: `${process.env.ACCESS_KEY_ID}`,
       secretAccessKey: `${process.env.SECRET_ACCESS_KEY}`,
       region: `${process.env.REGION}`
     };
 
+    // create kms instance to wire up AwsKMSService
     const kms = new KMS(config) as KMS;
     kmsService = new AwsKMSService(kmsOptions, kms);
 
+    // create s3 instance to wire up AwsS3Service
     const s3 = new S3(config) as S3;
     s3Service = new AwsS3Service(s3Options, s3);
 

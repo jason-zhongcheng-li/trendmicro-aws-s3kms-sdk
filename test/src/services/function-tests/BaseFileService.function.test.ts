@@ -12,6 +12,7 @@ describe('BaseFileService unit test', () => {
   const TEST_FILE = __dirname + '/file.txt';
 
   beforeEach(() => {
+
     options = {
       localDir: `${__dirname}/tmp`
     } as FileOptions;
@@ -83,21 +84,6 @@ describe('BaseFileService unit test', () => {
       await instance.writeToFileAsync(fileName, expect, false);
     }, new RegExp(E_FILE_EXIST));
 
-  });
-
-  it('Should clean up a temp file', done => {
-
-    // Use a synchronous function provided by fs for debug/testing only
-    fs.writeFileSync(`${instance.getLocalDir()}/test-file.txt`, 'Test content');
-    assert.doesNotThrow(() => exists('test-file.txt'));
-
-    instance
-      .cleanUpLocalFile('test-file.txt')
-      .then(() => {
-        assert.throws(() => exists('test-file.txt'));
-        done();
-      })
-      .catch(done);
   });
 
   function exists(fileName: string) {

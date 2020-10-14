@@ -1,10 +1,6 @@
-import * as fs from 'fs';
 import { DateTime } from 'luxon';
-import * as path from 'path';
 import { AwsS3Service } from './../services/AwsS3Service';
 import { AwsKMSService } from './../services/AwsKMSService';
-import { statusCode } from 'aws-sdk/clients/mediastoredata';
-import { E_S3_NO_OBJECTS_IN_BUCKET } from '../messages';
 
 export class TrendMicroFileAction {
   constructor(private s3Service: AwsS3Service, private kmsService: AwsKMSService) {
@@ -79,10 +75,7 @@ export class TrendMicroFileAction {
     if (Array.isArray(keys)) {
       await Promise.all(
         keys.map(async key => {
-          const destPath = await this.s3Service.getFile(bucket, key)
-            .catch(err => {
-              console.error(err);
-            });
+          const destPath = await this.s3Service.getFile(bucket, key);
           if (!!destPath) {
             result.push(key);
           }

@@ -1,4 +1,3 @@
-'use strict';
 import * as assert from 'assert';
 import { AwsKMSService } from '../../../../src/services/AwsKMSService';
 import { AwsS3Service } from '../../../../src/services/AwsS3Service';
@@ -6,8 +5,6 @@ import { TrendMicroFileAction } from './../../../../src/actions/TrendMicroFileAc
 import { expect } from 'chai';
 import chaiAsPromised = require('chai-as-promised');
 import chai = require('chai');
-import { E_S3_NO_OBJECTS_IN_BUCKET } from '../../../../src/messages';
-import { resolve } from 'path';
 
 describe('TrendMicroFileAction unit test', () => {
   let s3Service: AwsS3Service;
@@ -18,9 +15,13 @@ describe('TrendMicroFileAction unit test', () => {
   const keys: string[] = ['object-1', 'object-2'];
 
   beforeEach(() => {
+    // make chai be able to handle promise
     chai.use(chaiAsPromised);
+
+    // mock dependency/property/service to call mocked functions
     s3Service = Object.create(AwsS3Service.prototype);
     kmsService = Object.create(AwsKMSService.prototype);
+
     instance = new TrendMicroFileAction(s3Service, kmsService);
   });
 
@@ -54,7 +55,7 @@ describe('TrendMicroFileAction unit test', () => {
 
     const result = await instance.downloadAllObjects(bucket);
 
-    assert.deepStrictEqual(result, expect);
+    assert.deepStrictEqual(result, expect, 'should be expected keys');
 
   });
 
@@ -101,10 +102,12 @@ describe('TrendMicroFileAction unit test', () => {
 
   it('Should handle error for s3Service.getAllKeys()', async () => {
     const expectedError = new Error('getAllKeys() error');
+
     s3Service.getAllKeys = async param => {
       assert.strictEqual(param, bucket);
       throw expectedError;
     };
+
     await expect(instance.downloadAllObjects(bucket)).to.eventually.deep.equals([]);
   });
 });

@@ -19,13 +19,15 @@ describe('AwsS3Service functional test', async () => {
     options = {
       localDir: `${__dirname}/tmp`
     };
+
+    // config AWS options with credentials in .env
     const config: testConfig = {
       accessKeyId: `${process.env.ACCESS_KEY_ID}`,
       secretAccessKey: `${process.env.SECRET_ACCESS_KEY}`,
       region: `${process.env.REGION}`
     };
 
-    // Create S3 service object
+    // Create S3 instance
     s3 = new S3(config);
 
     instance = new AwsS3Service(options, s3);

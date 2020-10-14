@@ -1,5 +1,4 @@
 import * as fs from 'fs';
-import { DateTime } from 'luxon';
 import * as path from 'path';
 import { F_OK } from 'constants';
 import { Readable } from 'stream';
@@ -64,19 +63,11 @@ export class BaseFileService<O extends FileOptions> {
    * @returns {Promise<string>} return plain data in the file
    */
   public async readFromFileAsync(fileName: string): Promise<string> {
-
     const dest = this.concatFullPath(fileName);
 
-    return new Promise<string>((resolve, reject) => {
-      fs.readFile(dest, async (err, data) => {
-        if (!!err) {
-          console.error('Read file error in BaseFileService class');
-          reject(err);
-        } else {
-          resolve(data.toString());
-        }
-      });
-    });
+    // make fs.readFile() to be await
+    const data = await fs.promises.readFile(dest);
+    return data.toString();
   }
 
 
@@ -94,11 +85,7 @@ export class BaseFileService<O extends FileOptions> {
 
     // If replace is false, we need to check if file with same file name exists or not
     if (!replace) {
-      const fileExist = await this.isFileExistAsync(dest)
-        .catch(err => {
-          // have to handled rejection by rejecting a promise
-          return new Promise<boolean>(rej => rej(err));
-        });
+      const fileExist = await this.isFileExistAsync(dest);
 
       // In this case we dont allow to replace existing file
       if (fileExist) {
@@ -108,37 +95,9 @@ export class BaseFileService<O extends FileOptions> {
       }
     }
 
-    return new Promise<string>((resolve, reject) => {
-      fs.writeFile(dest, data, err => {
-        if (!!err) {
-          console.error('Write file error: ', err);
-          reject(err);
-        } else {
-          resolve(fileName);
-        }
-      });
-    });
-  }
-
-  /**
-   * Clean up local files
-   *
-   * @param  {string} fileName
-   * @returns {Promise<void>}
-   */
-  public async cleanUpLocalFile(fileName: string): Promise<void> {
-    return new Promise<void>((resolve, reject) => {
-      const dest: string = path.join(this.options.localDir, fileName);
-
-      // delete file in the destination
-      fs.unlink(dest, (err: Error) => {
-        if (!!err) {
-          reject(err);
-        } else {
-          resolve();
-        }
-      });
-    });
+    // make fs.writeFile() to be await
+    await fs.promises.writeFile(dest, data);
+    return fileName;
   }
 
   /**

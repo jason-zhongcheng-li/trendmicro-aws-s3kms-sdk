@@ -18,7 +18,9 @@ describe('AwsS3Service unit test', async () => {
   let CiphertextBlob: CiphertextType;
 
   beforeEach(async () => {
+    // make chai be able to handle promise
     chai.use(chaiAsPromised);
+
     options = {
       ACL: 'private',
       ServerSideEncryption: 'AES256',
@@ -26,8 +28,11 @@ describe('AwsS3Service unit test', async () => {
       localDir: `${__dirname}/tmp`,
       MaxKeys: 2
     };
-    s3 = Object.assign(S3.prototype);
-    CiphertextBlob = Object.assign(Buffer.prototype);
+
+    // mock dependency/property/service to call mocked functions
+    s3 = Object.create(S3.prototype);
+    CiphertextBlob = Object.create(Buffer.prototype);
+
     instance = new AwsS3Service(options, s3);
   });
 
