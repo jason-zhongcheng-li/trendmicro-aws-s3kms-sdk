@@ -1,6 +1,7 @@
 import { S3 } from 'aws-sdk';
 import { BaseFileService, FileOptions } from './BaseFileService';
 import { ListObjectsV2Request, GetObjectRequest } from 'aws-sdk/clients/s3';
+import { E_KMS_LOAD_KEYS } from '../messages';
 
 
 export interface S3FileOptions extends FileOptions {
@@ -50,7 +51,7 @@ export class AwsS3Service extends BaseFileService<S3FileOptions> {
    * @param  {string} bucket - The bucket name on S3
    * @returns {Promise<string[]>} - All the keys in a S3 bucket
    */
-  public async getAllKeys(bucket: string): Promise<string[]> {
+  public async getAllKeys(bucket: string): Promise<string[] | string> {
     const keys: string[] = [];
     let IsTruncated = false;
     let NextContinuationToken = '';
@@ -86,7 +87,7 @@ export class AwsS3Service extends BaseFileService<S3FileOptions> {
           break;
         }
       } catch (err) {
-        throw new Error(err);
+        return Promise.reject(E_KMS_LOAD_KEYS);
       }
     }
     return keys;

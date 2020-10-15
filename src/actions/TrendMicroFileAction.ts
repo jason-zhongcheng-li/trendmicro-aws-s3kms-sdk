@@ -1,11 +1,31 @@
 import { DateTime } from 'luxon';
 import { AwsS3Service } from './../services/AwsS3Service';
 import { AwsKMSService } from './../services/AwsKMSService';
+import { E_NUMBER_OF_PROCESSES_EXEED, E_S3_NO_OBJECTS_IN_BUCKET } from '../messages';
+
+export interface engryptArgs {
+  bucket: string;
+  keys?: string[];
+  fileName?: string;
+}
 
 export class TrendMicroFileAction {
   constructor(private s3Service: AwsS3Service, private kmsService: AwsKMSService) {
   }
 
+  /**
+   * Control concurrency to keep at most four parallel downloads in progress.
+   * @param  {Args[]=[]} argsArr
+   */
+  public async batchEncryptSummaryFiles(argsArr: engryptArgs[] = []): Promise<string[] | string> {
+    if (argsArr.length === 0 || argsArr.length > 4) {
+      return Promise.reject(E_NUMBER_OF_PROCESSES_EXEED);
+    }
+    const arrayFuns = argsArr.map(async args => {
+      return await this.encryptSummaryFile(args.bucket, args.keys, args.fileName);
+    });
+    return Promise.all([...arrayFuns]);
+  }
 
   /**
    * Encrypt plain text of the list of downloaded files to a local file
@@ -28,10 +48,14 @@ export class TrendMicroFileAction {
       keys = await this.downloadAllObjects(bucket);
     }
 
+    if (!keys || keys.length === 0) {
+      return Promise.reject(E_S3_NO_OBJECTS_IN_BUCKET);
+    }
+
     // Create default file name if fileName is not specified.
     if (!fileName) {
-      const nowStr = DateTime.local().toFormat('yyyy-MM-dd_hh-mm-ss');
-      fileName = nowStr.concat('_ObjectsList.txt');
+      const nowStr = DateTime.local().toFormat('yyyy-MM-dd_hh-mm-ss-u');
+      fileName = nowStr.concat('_ObjectsList_in_', bucket, '.txt');
     }
 
     // Convert string of keys with new line to buffer

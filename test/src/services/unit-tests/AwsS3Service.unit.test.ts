@@ -7,6 +7,7 @@ import { CiphertextType } from 'aws-sdk/clients/kms';
 import { expect } from 'chai';
 import chaiAsPromised = require('chai-as-promised');
 import chai = require('chai');
+import { E_NUMBER_OF_PROCESSES_EXEED, E_KMS_LOAD_KEYS } from '../../../../src/messages';
 
 describe('AwsS3Service unit test', async () => {
   let options: S3FileOptions;
@@ -140,5 +141,14 @@ describe('AwsS3Service unit test', async () => {
     };
 
     await expect(instance.getFile(bucket, key)).to.eventually.deep.equals(expectedError);
+  });
+
+  it('Should reject if get all keys error', async () => {
+    // mock s3.listObjectsV2() function and throw an error
+    s3.listObjectsV2 = () => {
+      throw new Error('error');
+    };
+
+    assert.rejects(async () => await instance.getAllKeys(bucket), new RegExp(E_KMS_LOAD_KEYS));
   });
 });

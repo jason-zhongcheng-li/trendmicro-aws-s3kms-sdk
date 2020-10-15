@@ -5,7 +5,8 @@ import { AwsS3Service, S3FileOptions } from './../../../../src/services/AwsS3Ser
 import { testConfig } from './../../testConfig';
 import { KMSFileOptions, AwsKMSService } from './../../../../src/services/AwsKMSService';
 import { KMS, S3 } from 'aws-sdk';
-import { TrendMicroFileAction } from '../../../../src/actions/TrendMicroFileAction';
+import { TrendMicroFileAction, engryptArgs } from '../../../../src/actions/TrendMicroFileAction';
+import { config } from 'dotenv/types';
 
 describe('TrendMicroFileAction function test', () => {
   let kmsOptions: KMSFileOptions;
@@ -63,6 +64,17 @@ describe('TrendMicroFileAction function test', () => {
 
     // assign result to summaryFileName variable to be used in following tests
     summaryFileName = result;
+  });
+
+  // Set timeout in this particular function test to void 2000ms timeout for an async function call
+  it('should control concurrency to keep at most four parallel downloads in progress.', async function () {
+    // tslint:disable-next-line: no-invalid-this
+    this.timeout(4000);
+    const args = { bucket } as engryptArgs;
+    const argsArr = [args, args, args, args];
+
+    const result = await instance.batchEncryptSummaryFiles(argsArr);
+    assert.strictEqual(result.length === argsArr.length, true);
   });
 
   it('should decrypt', async () => {

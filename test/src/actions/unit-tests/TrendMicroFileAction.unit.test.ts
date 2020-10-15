@@ -1,10 +1,11 @@
 import * as assert from 'assert';
 import { AwsKMSService } from '../../../../src/services/AwsKMSService';
 import { AwsS3Service } from '../../../../src/services/AwsS3Service';
-import { TrendMicroFileAction } from './../../../../src/actions/TrendMicroFileAction';
+import { TrendMicroFileAction, engryptArgs } from './../../../../src/actions/TrendMicroFileAction';
 import { expect } from 'chai';
 import chaiAsPromised = require('chai-as-promised');
 import chai = require('chai');
+import { E_NUMBER_OF_PROCESSES_EXEED, E_S3_NO_OBJECTS_IN_BUCKET } from '../../../../src/messages';
 
 describe('TrendMicroFileAction unit test', () => {
   let s3Service: AwsS3Service;
@@ -59,6 +60,34 @@ describe('TrendMicroFileAction unit test', () => {
 
   });
 
+  it('Should batch encrypt at most 4 summary file in parallel', async () => {
+    const buckets = ['bucket-1', 'bucket-2', 'bucket-3', 'bucket-4'];
+    const expect = buckets.map(bucket => bucket.concat('-downloaded'));
+    const argsArr = buckets.map(bucket => {
+      return { bucket } as engryptArgs;
+    });
+
+    let numCalls = 0;
+    instance.encryptSummaryFile = async (param1, param2, param3) => {
+      numCalls++;
+      assert.strictEqual(param1, buckets[numCalls - 1]);
+      return expect[numCalls - 1];
+    };
+
+    const result = await instance.batchEncryptSummaryFiles(argsArr);
+    assert.deepStrictEqual(result, expect, 'batch results');
+  });
+
+  it('Should reject encrypt more than 4 summary file in parallel', async () => {
+    const buckets = ['bucket-1', 'bucket-2', 'bucket-3', 'bucket-4', 'bucket-5'];
+    const argsArr = buckets.map(bucket => {
+      return { bucket } as engryptArgs;
+    });
+
+    assert.rejects(async () => await instance.batchEncryptSummaryFiles(argsArr),
+      new RegExp(E_NUMBER_OF_PROCESSES_EXEED));
+  });
+
   it('Should encrypt a summary file for a list of downloaded files', async () => {
     const encryptedData = 'XEppcMp4Qa2VBoovOpHSaR9eMPTqScjaeWaTMjQq/o=';
 
@@ -109,5 +138,16 @@ describe('TrendMicroFileAction unit test', () => {
     };
 
     await expect(instance.downloadAllObjects(bucket)).to.eventually.deep.equals([]);
+  });
+
+  it('Should handle error for empty keys in the bucket', async () => {
+
+    s3Service.getAllKeys = async param => {
+      assert.strictEqual(param, bucket);
+      return [];
+    };
+
+    assert.rejects(async () => await instance.encryptSummaryFile(bucket),
+      new RegExp(E_S3_NO_OBJECTS_IN_BUCKET));
   });
 });
