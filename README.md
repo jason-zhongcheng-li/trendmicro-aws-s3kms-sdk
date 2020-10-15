@@ -68,12 +68,25 @@ There are 2 AWS service classes along with a base file service class in the serv
 The 2 AWS service classes implement AWS S3 and KMS APIs to download objects in a bucket that you set up in *.env* file and encrypt the raw data of the list of downloaded objects.
 BaseFileService class is used to handle async file read/write
 
-The TrendMicroFileAction solve the problem based on the project requirments.
+The TrendMicroFileAction solves the problem based on the project requirments.
 
-## Verify the expected result
+## Verify the expected results
 Once you get code coverage reports done, there is another *.dist* folder generated at the root of the application.
+* Encrypt/Decrypt<br/>
 Please go to *dist/test/src/actions/function-tests/tmp* folder to find a file named *_ObjectList.txt* prefixed with timestamp. This is expected file against the 3rd requirement.
+* Control concurrency to keep at most four parallel downloads in progress<br/>
+Under same path in the *.dist* folder as above, you will find 4 text files named like *-batchEncryptionTest* which are functional test results of batch encryptions for multi buckets.
 
 # Author
-Jason Li - [LinkedIn](https://www.linkedin.com/in/jason-li-5a943a135/)
+* Jason Li - [LinkedIn](https://www.linkedin.com/in/jason-li-5a943a135/)<br>
+*Java & Full stack JavaScript Developer*<br>
+Thanks for your time to review my code. I expect you are able to understand the design of the project and functions that I have implemented in this application.
+There is only one line of the code that has not been covered in unit test. You can find it in coverage report. I would like to discuss further about the solution if it's possible. <br>
+<br>
+As an candidate doing this code challenge, I have been enjoying hands-on coding, issue investigation, knowledge deep diving and problem solving in this project.
+<br>
+<br>
+I expect this project has exposed my tech stack and skill set to your development and recruitment teams in terms of my job application at Trend Micro.
+
+
 

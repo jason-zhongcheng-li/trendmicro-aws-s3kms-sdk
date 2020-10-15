@@ -102,7 +102,6 @@ describe('TrendMicroFileAction unit test', () => {
     };
 
     s3Service.writeToFileAsync = async (param1, param2) => {
-      assert.strictEqual(param1, fileName, 'should be fine name');
       assert.strictEqual(param2, encryptedData, 'should be encrypted data');
       return fileName;
     };

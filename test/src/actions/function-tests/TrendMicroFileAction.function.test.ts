@@ -70,8 +70,10 @@ describe('TrendMicroFileAction function test', () => {
   it('should control concurrency to keep at most four parallel downloads in progress.', async function () {
     // tslint:disable-next-line: no-invalid-this
     this.timeout(4000);
-    const args = { bucket } as engryptArgs;
-    const argsArr = [args, args, args, args];
+    const buckets = [bucket, bucket, bucket, bucket];
+    const argsArr = buckets.map(bucket => {
+      return { bucket, fileName: bucket.concat('-batchEncryptionTest') } as engryptArgs;
+    });
 
     const result = await instance.batchEncryptSummaryFiles(argsArr);
     assert.strictEqual(result.length === argsArr.length, true);

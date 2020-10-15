@@ -18,6 +18,7 @@ export class TrendMicroFileAction {
    * @param  {Args[]=[]} argsArr
    */
   public async batchEncryptSummaryFiles(argsArr: engryptArgs[] = []): Promise<string[] | string> {
+
     if (argsArr.length === 0 || argsArr.length > 4) {
       return Promise.reject(E_NUMBER_OF_PROCESSES_EXEED);
     }
@@ -53,9 +54,11 @@ export class TrendMicroFileAction {
     }
 
     // Create default file name if fileName is not specified.
+    const nowStr = DateTime.local().toFormat('yyyy-MM-dd_hh-mm-ss-u');
     if (!fileName) {
-      const nowStr = DateTime.local().toFormat('yyyy-MM-dd_hh-mm-ss-u');
       fileName = nowStr.concat('_ObjectsList_in_', bucket, '.txt');
+    } else {
+      fileName = nowStr.concat(fileName, bucket, '.txt');
     }
 
     // Convert string of keys with new line to buffer
