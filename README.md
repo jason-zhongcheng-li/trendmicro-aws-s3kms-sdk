@@ -79,7 +79,9 @@ Under same path in the *.dist* folder as above, you will find 4 text files named
 
 # Author
 * Jason Li - [LinkedIn](https://www.linkedin.com/in/jason-li-5a943a135/)<br>
-*Java & Full stack JavaScript Developer*<br>
+*Java & Full stack JavaScript Developer*
+<br>
+<br>
 Thanks for your time to review my code. I expect you are able to understand the design of the project and functions that I have implemented in this application.
 There is only one line of the code that has not been covered in unit test. You can find it in coverage report. I would like to discuss further about the solution if it's possible. <br>
 <br>
