@@ -27,7 +27,7 @@ describe('TrendMicroFileAction unit test', () => {
   });
 
   it('Should download all objects', async () => {
-    const expect = ['object-1.txt', 'object-2.jpg'];
+    const expectData = ['object-1.txt', 'object-2.jpg'];
 
     s3Service.getAllKeys = async param => {
       assert.strictEqual(param, bucket);
@@ -46,42 +46,42 @@ describe('TrendMicroFileAction unit test', () => {
       // function is called in a loop so the arguments will be different
       // it is called twrice only due to the length of keys returned by s3Service.getAllKeys
       if (numCalls === 1) {
-        assert.strictEqual(param2, expect[0], 'download the first object');
+        assert.strictEqual(param2, expectData[0], 'download the first object');
         return 'the-first-object-path';
       } else if (numCalls === 2) {
-        assert.strictEqual(param2, expect[1], 'download the second object');
+        assert.strictEqual(param2, expectData[1], 'download the second object');
         return 'the-second-object-path';
       }
     };
 
     const result = await instance.downloadAllObjects(bucket);
 
-    assert.deepStrictEqual(result, expect, 'should be expected keys');
+    assert.deepStrictEqual(result, expectData, 'should be expected keys');
 
   });
 
   it('Should batch encrypt at most 4 summary file in parallel', async () => {
     const buckets = ['bucket-1', 'bucket-2', 'bucket-3', 'bucket-4'];
-    const expect = buckets.map(bucket => bucket.concat('-downloaded'));
-    const argsArr = buckets.map(bucket => {
-      return { bucket } as engryptArgs;
+    const expectResult = buckets.map(obj => obj.concat('-downloaded'));
+    const argsArr = buckets.map(obj => {
+      return { bucket: obj } as engryptArgs;
     });
 
     let numCalls = 0;
     instance.encryptSummaryFile = async (param1, param2, param3) => {
       numCalls++;
       assert.strictEqual(param1, buckets[numCalls - 1]);
-      return expect[numCalls - 1];
+      return expectResult[numCalls - 1];
     };
 
     const result = await instance.batchEncryptSummaryFiles(argsArr);
-    assert.deepStrictEqual(result, expect, 'batch results');
+    assert.deepStrictEqual(result, expectResult, 'batch results');
   });
 
   it('Should reject encrypt more than 4 summary file in parallel', async () => {
     const buckets = ['bucket-1', 'bucket-2', 'bucket-3', 'bucket-4', 'bucket-5'];
-    const argsArr = buckets.map(bucket => {
-      return { bucket } as engryptArgs;
+    const argsArr = buckets.map(obj => {
+      return { bucket: obj } as engryptArgs;
     });
 
     assert.rejects(async () => await instance.batchEncryptSummaryFiles(argsArr),
@@ -112,7 +112,7 @@ describe('TrendMicroFileAction unit test', () => {
 
   it('Should decrypt a summary file for a list of downloaded files', async () => {
     const encryptedData = 'XEppcMp4Qa2VBoovOpHSaR9eMPTqScjaeWaTMjQq/o=';
-    const expect = 'raw-data';
+    const expectRawData = 'raw-data';
 
     s3Service.readFromFileAsync = async param => {
       assert.strictEqual(param, fileName, 'should be the file name');
@@ -121,7 +121,7 @@ describe('TrendMicroFileAction unit test', () => {
 
     kmsService.decrypt = async param => {
       assert.strictEqual(param, encryptedData);
-      return expect;
+      return expectRawData;
     };
 
     const result = await instance.decryptSummaryFile(fileName);

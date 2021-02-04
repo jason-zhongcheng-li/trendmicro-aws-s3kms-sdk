@@ -1,6 +1,6 @@
 import { KMS, Request } from 'aws-sdk';
 import * as assert from 'assert';
-import { CiphertextType, EncryptResponse, DecryptResponse, EncryptRequest } from 'aws-sdk/clients/kms';
+import { CiphertextType, EncryptResponse, DecryptResponse } from 'aws-sdk/clients/kms';
 import { AwsKMSService, KMSFileOptions } from '../../../../src/services/AwsKMSService';
 import { E_KMS_KEYID_UNDEFINED } from '../../../../src/messages';
 
