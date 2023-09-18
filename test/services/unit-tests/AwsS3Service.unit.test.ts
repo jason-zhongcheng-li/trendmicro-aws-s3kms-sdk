@@ -2,12 +2,12 @@ import { S3, Request } from 'aws-sdk';
 import * as assert from 'assert';
 import { Readable } from 'stream';
 import { ListObjectsV2Output } from 'aws-sdk/clients/s3';
-import { S3FileOptions, AwsS3Service } from '../../../../src/services/AwsS3Service';
+import { S3FileOptions, AwsS3Service } from '../../../src/services/AwsS3Service';
 import { CiphertextType } from 'aws-sdk/clients/kms';
 import { expect } from 'chai';
 import chaiAsPromised = require('chai-as-promised');
 import chai = require('chai');
-import { E_NUMBER_OF_PROCESSES_EXEED, E_KMS_LOAD_KEYS } from '../../../../src/messages';
+import { E_KMS_LOAD_KEYS } from '../../../src/messages';
 
 describe('AwsS3Service unit test', async () => {
   let options: S3FileOptions;

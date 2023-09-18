@@ -1,6 +1,6 @@
 import * as assert from 'assert';
 import { testConfig } from './../../testConfig';
-import { KMSFileOptions, AwsKMSService } from './../../../../src/services/AwsKMSService';
+import { KMSFileOptions, AwsKMSService } from '../../../src/services/AwsKMSService';
 import { KMS } from 'aws-sdk';
 
 describe('AwsKMSService function test', () => {

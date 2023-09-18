@@ -1,7 +1,7 @@
 import * as assert from 'assert';
 import * as path from 'path';
 import { S3 } from 'aws-sdk';
-import { S3FileOptions, AwsS3Service } from './../../../../src/services/AwsS3Service';
+import { S3FileOptions, AwsS3Service } from '../../../src/services/AwsS3Service';
 import { testConfig } from '../../testConfig';
 
 

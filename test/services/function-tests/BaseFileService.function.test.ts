@@ -3,8 +3,8 @@ import * as fs from 'fs';
 import * as rimraf from 'rimraf';
 import { F_OK } from 'constants';
 import { Readable } from 'stream';
-import { FileOptions, BaseFileService } from '../../../../src/services/BaseFileService';
-import { E_LOCALDIR_UNDEFINED, E_LOCALDIR_UNWRITABLE, E_FILE_EXIST } from '../../../../src/messages';
+import { FileOptions, BaseFileService } from '../../../src/services/BaseFileService';
+import { E_LOCALDIR_UNDEFINED, E_LOCALDIR_UNWRITABLE, E_FILE_EXIST } from '../../../src/messages';
 
 describe('BaseFileService unit test', () => {
   let options: FileOptions;
@@ -25,7 +25,7 @@ describe('BaseFileService unit test', () => {
       fs.unlinkSync(TEST_FILE);
     }
 
-    if (fs.existsSync(instance.getLocalDir() + '/trash')) {
+    if (fs.existsSync(instance.getLocalDir())) {
       rimraf.sync(instance.getLocalDir() + '/trash');
     }
   });

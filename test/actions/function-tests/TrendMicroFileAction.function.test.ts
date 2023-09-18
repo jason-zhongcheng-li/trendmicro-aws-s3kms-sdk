@@ -1,11 +1,11 @@
 import * as assert from 'assert';
 import * as sysPath from 'path';
 import * as fs from 'fs';
-import { AwsS3Service, S3FileOptions } from './../../../../src/services/AwsS3Service';
+import { AwsS3Service, S3FileOptions } from '../../../src/services/AwsS3Service';
 import { testConfig } from './../../testConfig';
-import { KMSFileOptions, AwsKMSService } from './../../../../src/services/AwsKMSService';
+import { KMSFileOptions, AwsKMSService } from '../../../src/services/AwsKMSService';
 import { KMS, S3 } from 'aws-sdk';
-import { TrendMicroFileAction, engryptArgs } from '../../../../src/actions/TrendMicroFileAction';
+import { TrendMicroFileAction, engryptArgs } from '../../../src/actions/TrendMicroFileAction';
 import { config } from 'dotenv/types';
 
 describe('TrendMicroFileAction function test', () => {

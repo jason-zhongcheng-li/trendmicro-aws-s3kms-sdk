@@ -1,11 +1,11 @@
 import * as assert from 'assert';
-import { AwsKMSService } from '../../../../src/services/AwsKMSService';
-import { AwsS3Service } from '../../../../src/services/AwsS3Service';
-import { TrendMicroFileAction, engryptArgs } from './../../../../src/actions/TrendMicroFileAction';
+import { AwsKMSService } from '../../../src/services/AwsKMSService';
+import { AwsS3Service } from '../../../src/services/AwsS3Service';
+import { TrendMicroFileAction, engryptArgs } from '../../../src/actions/TrendMicroFileAction';
 import { expect } from 'chai';
 import chaiAsPromised = require('chai-as-promised');
 import chai = require('chai');
-import { E_NUMBER_OF_PROCESSES_EXEED, E_S3_NO_OBJECTS_IN_BUCKET } from '../../../../src/messages';
+import { E_NUMBER_OF_PROCESSES_EXEED, E_S3_NO_OBJECTS_IN_BUCKET } from '../../../src/messages';
 
 describe('TrendMicroFileAction unit test', () => {
   let s3Service: AwsS3Service;
